@@ -1,0 +1,21 @@
+{
+  "application-name": "Element Mix",
+  "pack-name": "dev.cas.game_hub",
+  "release-channel": "alpha",
+  "version": "v0.0.2-alpha",
+  "latest-update": {
+    "code": "2025.05.01-alpha",
+    "summary": "Initial Alpha release",
+    "notes": [],
+    "breaking-change": true
+  },
+  "service-id": "9832-15976098531-32",
+  "reset-database": false,
+  "database-version": "v0.0.26",
+  "alpha-policy": {
+    "data-stability": "unstable",
+    "api-stability": "unstable",
+    "allow-db-reset": true,
+    "feedback-required": true
+  }
+}

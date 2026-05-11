@@ -1,0 +1,10 @@
+{
+  "home": {
+    "continue": [0, "home_continue", 0],
+    "how_to_play": [0, "home_how_to_play", 0],
+    "level": [0, "home_level", 0],
+    "new": [0, "home_new", 0],
+    "load": [0, "home_load", 0],
+    "settings": [0, "home_settings", 0]
+  }
+}

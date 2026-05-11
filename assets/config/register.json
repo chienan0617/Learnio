@@ -1,0 +1,40 @@
+{
+  "app": {
+    "tutored": false,
+    "first": false,
+    "language": 1,
+    "navigation-bar-index": 0,
+    "task-id": 0,
+    "task-group-id": 0,
+    "setting:theme": "light",
+    "setting:lang": 0,
+    "setting:dark-mode-enable": false,
+    "calendar-view-mode": 0
+  },
+  "debug": {
+    "first-add": false
+  },
+  "recycle-bin": {
+    "removable": false
+  },
+  "groups": {
+    "<init>": null
+  },
+  "notes": {
+    "<init>": null
+  },
+  "todos": {
+    "<init>": null,
+    "unname-times": -0
+  },
+  "tags": {
+    "<init>": null
+  },
+  "priorities": {
+    "<init>": null,
+    "has-default-priority": false
+  },
+  "internet": {
+    "default-active": 0
+  }
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+            background-color: #09090B;
+        }
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            color: #FFFFFF;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            border-bottom: 2px solid #27272A;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #69F0AE;
+            font-size: 24pt;
+            margin: 0;
+        }
+        h2 {
+            color: #A855F7;
+            font-size: 18pt;
+            border-left: 4px solid #A855F7;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+        .game-section {
+            margin-bottom: 25px;
+            background-color: #18181B;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .game-title {
+            font-weight: bold;
+            font-size: 14pt;
+            color: #F4F6FA;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .accent {
+            width: 4px;
+            height: 18px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .description {
+            color: #94A3B8;
+            font-size: 11pt;
+        }
+        .rules-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .rules-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CAStudio 遊戲開發計畫報告</h1>
+        <p style="color: #64748B;">日期：2026年5月9日 | 專案：Game Hub 益智遊戲集</p>
+    </div>
+
+    <p>本報告旨在說明「Game Hub」應用程式中新增及既有益智遊戲的玩法邏輯與規則說明。所有遊戲均採極簡主義設計，著重於核心解謎體驗。</p>
+
+    <h2>1. 新增文字類遊戲 (Word Games)</h2>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #7C3AED;"></div>Word Connect (單字接龍)</div>
+        <p class="description">經典的字母連結遊戲，挑戰詞彙量與空間聯想能力。</p>
+        <ul class="rules-list">
+            <li>玩家需在下方的字母盤中，透過滑動連線組成完整的單字。</li>
+            <li>填滿上方空格方塊即可過關。</li>
+            <li>隱藏單字：找出非關卡解答的有效單字可獲得額外獎勵。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #F43F5E;"></div>Anagrams (字母異位詞)</div>
+        <p class="description">重新排列字母以發現隱藏的所有單字組合。</p>
+        <ul class="rules-list">
+            <li>系統給出一組混亂的字母。</li>
+            <li>玩家需找出這組字母能組成的所有長度組合。</li>
+            <li>這非常考驗對字根字首的熟悉度。</li>
+        </ul>
+    </div>
+
+    <h2>2. 經典邏輯與數字遊戲</h2>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #69F0AE;"></div>Sudoku (數獨)</div>
+        <p class="description">全球最受歡迎的數字填寫邏輯遊戲。</p>
+        <ul class="rules-list">
+            <li>在 9x9 的網格中，每一行、每一列以及每一個 3x3 的九宮格內，數字 1-9 必須各出現一次且不重複。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #FFB74D;"></div>2048</div>
+        <p class="description">簡單卻容易上癮的數字合併遊戲。</p>
+        <ul class="rules-list">
+            <li>滑動螢幕使所有方塊移動，相同數字的方塊碰撞時會合併相加。</li>
+            <li>目標是拼湊出數字為 2048 的方塊。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #42A5F5;"></div>Minesweeper (踩地雷)</div>
+        <p class="description">經典的策略排雷遊戲。</p>
+        <ul class="rules-list">
+            <li>點擊方塊以揭開其下內容。數字代表周圍 8 格內隱藏的地雷數量。</li>
+            <li>長按可標記地雷旗幟。避開所有地雷並揭開所有安全區域即獲勝。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #AB47BC;"></div>Cross Sum (交叉加法 / Kakuro)</div>
+        <p class="description">類似數獨與填字遊戲的結合，專注於心算。</p>
+        <ul class="rules-list">
+            <li>網格中的數字總和必須符合對應行列的提示數字。</li>
+            <li>同一連續線條內的數字不得重複。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #81C784;"></div>KenKen (賢賢字謎)</div>
+        <p class="description">結合四則運算的算術邏輯遊戲。</p>
+        <ul class="rules-list">
+            <li>每一行與列的數字不能重複。</li>
+            <li>粗框區域內的數字透過指定的運算符號（+、-、×、÷）計算後，必須等於區域提示的數字。</li>
+        </ul>
+    </div>
+
+    <div class="game-section">
+        <div class="game-title"><div class="accent" style="background-color: #F06292;"></div>Word Search (文字搜索)</div>
+        <p class="description">在字母陣列中尋找目標單字。</p>
+        <ul class="rules-list">
+            <li>單字可能以水平、垂直或對角線方向隱藏在網格中。</li>
+            <li>找出所有清單中的單字即可過關。</li>
+        </ul>
+    </div>
+
+</body>
+</html>

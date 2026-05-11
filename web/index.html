@@ -1,46 +1,254 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
+
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Learning with AI">
 
-  <!-- iOS meta tags & icons -->
+  <meta name="description" content="Learnio - Learning with AI 增進學習效率。">
+  <meta name="keywords" content="Learnio, mix, tool, PWA">
+  <meta property="og:title" content="Learnio">
+  <meta property="og:description" content="Learning with AI 探索無限可能。">
+
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="learnio">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Learnio">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>learnio</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.json">
-</head>
-<body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F0F4F8">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0D1B2A">
+
+  <title>Learnio - Play all in one place</title>
+
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+
+  <style id="splash-screen-style">
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at center, #1E3045 0%, #0D1B2A 100%);
+      background-size: cover;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 22%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+    }
+
+    #custom-loader {
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 240px;
+      height: 2px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+    }
+
+    #custom-loader::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 30%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, #00E5FF, transparent);
+      box-shadow: 0 0 8px #00E5FF;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite ease-in-out;
+    }
+
+    @keyframes shimmer {
+      0% {
+        left: -30%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+
+    .glass-banner {
+      position: fixed;
+      top: max(20px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85%;
+      max-width: 400px;
+      background: rgba(13, 27, 42, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      z-index: 9999;
+      color: #E8F0F4;
+      animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    .glass-banner .title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #00E5FF;
+    }
+
+    .glass-banner .desc {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .glass-banner .hint {
+      margin: 0;
+      font-size: 13px;
+      color: #7FFFEF;
+      font-weight: 600;
+      background: rgba(127, 255, 239, 0.1);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border-left: 3px solid #7FFFEF;
+    }
+
+    .glass-banner .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .glass-banner button {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #E8F0F4;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .glass-banner button.primary-btn {
+      background: #00E5FF;
+      color: #0D1B2A;
+      border: none;
+    }
+  </style>
+
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("custom-loader")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
+</head>
+
+<body>
+  <picture id="splash">
+    <source
+      srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x"
+      media="(prefers-color-scheme: light)">
+    <source
+      srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x"
+      media="(prefers-color-scheme: dark)">
+    <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="Learnio Splash">
+  </picture>
+
+  <div id="custom-loader"></div>
+
+  <div id="a2hs-banner" class="glass-banner">
+    <div class="title">體驗完整版 Learnio</div>
+    <div class="desc">在 Safari 點擊分享圖示並選擇「加入主畫面」，即可隨時使用全螢幕體驗。</div>
+    <div class="hint">建議使用 Chrome 或 Safari 以確保資料不丟失及獲得最佳體驗。</div>
+    <div class="actions">
+      <button onclick="dismissIosBanner()">我知道了</button>
+    </div>
+  </div>
+
+  <div id="install-banner" class="glass-banner">
+    <div class="title">安裝 Learnio</div>
+    <div class="desc">將應用程式加入主畫面，享受免瀏覽器的沉浸式體驗。</div>
+    <div class="hint">建議在 Chrome 瀏覽器中開啟以獲得最佳效能。</div>
+    <div class="actions">
+      <button onclick="dismissInstallBanner()">稍後再說</button>
+      <button id="install-btn" class="primary-btn">立即安裝</button>
+    </div>
+  </div>
+
+  <script src="flutter_bootstrap.js" async=""></script>
+
+  <script>
+    let deferredPrompt;
+    function isIos() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+    function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
+    function showIosBanner() { document.getElementById('a2hs-banner').style.display = 'flex'; }
+    function dismissIosBanner() { document.getElementById('a2hs-banner').style.display = 'none'; }
+    function showInstallBanner() { document.getElementById('install-banner').style.display = 'flex'; }
+    function dismissInstallBanner() { document.getElementById('install-banner').style.display = 'none'; }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isIos() && !isStandalone()) { showInstallBanner(); }
+    });
+
+    window.addEventListener('load', () => {
+      if (isIos() && !isStandalone()) { showIosBanner(); }
+      if (isStandalone()) { dismissIosBanner(); dismissInstallBanner(); }
+    });
+
+    document.getElementById('install-btn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      dismissInstallBanner();
+    });
+  </script>
 </body>
+
 </html>

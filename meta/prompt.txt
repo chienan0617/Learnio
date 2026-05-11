@@ -1,0 +1,460 @@
+{
+  "dark_mode": true,
+  "primary": [
+    "#A855F7",
+    "#7C3AED"
+  ],
+  "secondary": [
+    "#D8B4FE",
+    "#5B21B6"
+  ],
+  "tertiary": [
+    "#6D28D9",
+    "#4C1D95"
+  ],
+  "normal": [
+    "#EDE9FE",
+    "#EDE9FE"
+  ],
+  "debug_color": "#A855F7",
+  "debug_color_2": "#D8B4FE",
+  "default_font_family": "Space Grotesk",
+  "enable_debug_box": false,
+  "enable_liquid_glass": true,
+  "bg1": [
+    "#0B0F17",
+    "#F4F6FA"
+  ],
+  "bg1_5": [
+    "#111827",
+    "#E5EAF2"
+  ],
+  "bg2": [
+    "#172033",
+    "#D8E0EA"
+  ],
+  "bg3": [
+    "#1E293B",
+    "#C9D3E1"
+  ],
+  "bg4": [
+    "#273449",
+    "#B5C2D4"
+  ],
+  "bg5": [
+    "#334155",
+    "#9DB0C7"
+  ],
+  "so1": [
+    "#A855F7",
+    "#DDD3F0"
+  ],
+  "tx1": [
+    "#FFFFFF",
+    "#0B0F17"
+  ],
+  "tx1p": [
+    "#FFFFFF",
+    "#FFFFFF"
+  ],
+  "tx2": [
+    "#E5E7EB",
+    "#1F2937"
+  ],
+  "tx2p": [
+    "#D8B4FE",
+    "#6D28D9"
+  ],
+  "tx3": [
+    "#C084FC",
+    "#A855F7"
+  ],
+  "tx4": [
+    "#D8B4FE",
+    "#8B5CF6"
+  ],
+  "tx5": [
+    "#6D28D9",
+    "#6D28D9"
+  ],
+  "tx6": [
+    "#94A3B8",
+    "#64748B"
+  ],
+  "tx6p": [
+    "#718096",
+    "#5B6473"
+  ],
+  "background1": [
+    "#0B0F17",
+    "#F4F6FA"
+  ],
+  "background2": [
+    "#A855F7",
+    "#7C3AED"
+  ],
+  "background3": [
+    "#05070C",
+    "#FFFFFF"
+  ],
+  "background4": [
+    "#111827",
+    "#E5EAF2"
+  ]
+}
+
+import 'package:learnio/base.dart';
+
+const transparent = Colors.transparent;
+final void Function() onPressed = none;
+void none() {}
+
+const fw1 = FontWeight.w100;
+const fw2 = FontWeight.w200;
+const fw3 = FontWeight.w300;
+const fw4 = FontWeight.w400;
+const fw5 = FontWeight.w500;
+const fw6 = FontWeight.w600;
+const fw7 = FontWeight.w700;
+const fw8 = FontWeight.w800;
+const fw9 = FontWeight.w900;
+
+const caS = CrossAxisAlignment.start;
+const caC = CrossAxisAlignment.center;
+const caE = CrossAxisAlignment.end;
+const spB = MainAxisAlignment.spaceBetween;
+const maS = MainAxisAlignment.start;
+const maC = MainAxisAlignment.center;
+const mainMi = MainAxisSize.min;
+const mainMa = MainAxisSize.max;
+
+const fsN = FontStyle.normal;
+const fsI = FontStyle.italic;
+
+typedef string = String;
+
+class CommonColors {
+  static final success = darkMode ? hexColor("#10B981") : hexColor("#059669");
+  static final successSoft = darkMode
+      ? hexColor("#064E3B")
+      : hexColor("#D1FAE5");
+
+  // 錯誤 (Error/Danger)
+  static final error = darkMode ? hexColor("#EF4444") : hexColor("#DC2626");
+  static final errorSoft = hexColor("#FEE2E2");
+  //darkMode ? hexColor("#450A0A") :
+  // 警告 (Warning)
+  static final warning = darkMode ? hexColor("#F59E0B") : hexColor("#D97706");
+  static final warningSoft = darkMode
+      ? hexColor("#451A03")
+      : hexColor("#FEF3C7");
+
+  // 資訊 (Info)
+  static final info = darkMode ? hexColor("#0EA5E9") : hexColor("#0284C7");
+  static final infoSoft = darkMode ? hexColor("#0C4A6E") : hexColor("#E0F2FE");
+}
+
+import 'package:learnio/base.dart';
+
+class AppTheme {
+  static late Map<String, dynamic> data;
+
+  static Future<void> initialize() async {
+    data = await FileHandle.getAndSaveCache("theme", "theme");
+  }
+}
+
+bool get darkMode =>
+    Data.app.get("dark_mode", false); //AppTheme.data["dark_mode"] ?? false;
+Color get primary => _c("primary");
+Color get pri => primary;
+Color get secondary => _c("secondary");
+Color get sec => secondary;
+Color get tertiary => _c("tertiary");
+Color get ter => tertiary;
+Color get normal => _c("normal");
+Color get nor => normal;
+
+String get faSg => AppTheme.data["default_font_family"] ?? "Space Grotesk";
+bool get enableDebugBox => AppTheme.data["enable_debug_box"] ?? false;
+bool get enableLiquidGlass => AppTheme.data["enable_liquid_glass"] ?? false;
+
+Color get debugColor => hexColor(AppTheme.data["debug_color"]);
+Color get debugColor2 => hexColor(AppTheme.data["debug_color_2"]);
+
+Color get bg1 => _c("bg1");
+Color get bg1_5 => _c("bg1_5");
+Color get bg2 => _c("bg2");
+Color get bg3 => _c("bg3");
+Color get bg4 => _c("bg4");
+Color get bg5 => _c("bg5");
+
+Color get so1 => _c("so1");
+
+Color get tx1 => _c("tx1");
+Color get tx1p => _c("tx1p");
+Color get tx2 => _c("tx2");
+Color get tx2p => _c("tx2p");
+Color get tx3 => _c("tx3");
+Color get tx6 => _c("tx6");
+Color get tx6p => _c("tx6p");
+
+Color get background1 => _c("background1");
+Color get background2 => _c("background2");
+Color get background3 => _c("background3");
+Color get background4 => _c("background4");
+
+Color _c(String key) {
+  final List list = AppTheme.data[key];
+  final String hex = darkMode ? list[0] : list[1];
+  return hexColor(hex);
+}
+
+Color primaryStyle = decideStyle(primary);
+
+
+
+import 'package:learnio/base.dart';
+
+SizedBox width([v = 0.0]) => SizedBox(width: v.toDouble());
+SizedBox height([v = 0.0]) => SizedBox(height: v.toDouble());
+SizedBox box([w = 0.0, h = 0.0, Widget? c]) =>
+    SizedBox(width: w.toDouble(), height: h.toDouble(), child: c);
+SizedBox boxV(v) => SizedBox(child: v);
+
+Size size(ctx) => MediaQuery.of(ctx).size;
+
+Text text(
+  String msg, [
+  double size = 16,
+  FontWeight weight = fw5,
+  Color? color,
+  bool translate = false,
+  String? fontFamily,
+  FontStyle style = fsN,
+]) => Text(
+  translate ? word(msg) : msg,
+  style: TextStyle(
+    fontSize: size,
+    fontWeight: weight,
+    fontStyle: style,
+    color: color ?? tx1,
+    letterSpacing: 0,
+    fontFamily: fontFamily,
+  ),
+);
+
+Text textNt(
+  String msg, [
+  double size = 16,
+  FontWeight weight = fw5,
+  Color? color,
+  String? family,
+  FontStyle style = fsN,
+]) => text(msg, size, weight, color, false, family, style);
+
+Text textD(
+  String msg, [
+  double size = 16,
+  FontWeight weight = fw5,
+  Color? color,
+  String? family,
+  FontStyle style = fsN,
+]) => System.debugMode
+    ? textNt(msg, size, weight, color, family, style)
+    : throw DebugError();
+
+BorderRadius borderCircular(double v) => BorderRadius.circular(v);
+EdgeInsets symmetricH(double v) => EdgeInsets.symmetric(horizontal: v);
+EdgeInsets symmetricV(double v) => EdgeInsets.symmetric(vertical: v);
+EdgeInsets symmetric(double h, double v) =>
+    EdgeInsets.symmetric(horizontal: h, vertical: v);
+EdgeInsets symmetricAll(double v) => EdgeInsets.all(v);
+
+Center center(Widget v) => Center(child: v);
+
+Expanded expand([Widget? v, int f = 1]) => Expanded(flex: f, child: v ?? box());
+Spacer spacer() => Spacer();
+// Expanded expandV(v) => Expanded(child: v);
+
+Card card(Widget v) => Card(child: v);
+
+SingleChildScrollView scroll(Widget v, [ScrollPhysics? p]) =>
+    SingleChildScrollView(physics: p, child: v);
+
+Icon icon(IconData icon, [double size = 20, Color? color, FontWeight? fw]) =>
+    Icon(icon, size: size, color: color ?? tx1, fontWeight: fw);
+
+IconButton iconButton(Icon icon, [fn]) => IconButton(onPressed: fn, icon: icon);
+
+// Widget liquidGlass(
+//   Widget c, {
+//   double b = 15,
+//   double t = 20,
+//   double r = 10,
+//   bool cr = false,
+// }) => enableLiquidGlass
+//     ? LiquidGlassLayer(
+//         settings: LiquidGlassSettings(blur: b, thickness: t),
+//         child: LiquidGlass(
+//           shape: cr ? LiquidOval() : LiquidRoundedRectangle(borderRadius: r),
+//           child: c,
+//         ),
+//       )
+//     : c;
+
+InkWell inkWell(
+  Widget v, [
+  VoidCallback? fn,
+  Color splash = transparent,
+  Color? focus,
+  Color? hover,
+]) => InkWell(
+  onTap: fn,
+  splashColor: splash,
+  focusColor: focus,
+  hoverColor: hover,
+  child: v,
+);
+
+GestureDetector gestureDetector(Widget v, [tap, longPress]) =>
+    GestureDetector(onTap: tap, onLongPress: longPress, child: v);
+
+Widget debugBox(Widget v) => enableDebugBox
+    ? Container(
+        decoration: BoxDecoration(border: BoxBorder.all(color: debugColor)),
+        child: v,
+      )
+    : v;
+
+Column column(
+  List<Widget> c, {
+  MainAxisAlignment ma = MainAxisAlignment.start,
+  CrossAxisAlignment ca = CrossAxisAlignment.start,
+  MainAxisSize ms = MainAxisSize.min,
+}) => Column(
+  mainAxisAlignment: ma,
+  crossAxisAlignment: ca,
+  mainAxisSize: ms,
+  children: c,
+);
+
+Row row(
+  List<Widget> c, {
+  MainAxisAlignment ma = MainAxisAlignment.start,
+  CrossAxisAlignment ca = CrossAxisAlignment.start,
+  MainAxisSize ms = MainAxisSize.min,
+}) => Row(
+  mainAxisAlignment: ma,
+  crossAxisAlignment: ca,
+  mainAxisSize: ms,
+  children: c,
+);
+
+Stack stack(List<Widget> c, {AlignmentGeometry a = Alignment.center}) =>
+    Stack(alignment: a, children: c);
+
+Positioned positioned(
+  Widget c, {
+  num? l,
+  num? t,
+  num? r,
+  num? b,
+  num? w,
+  num? h,
+}) {
+  return Positioned(
+    left: l?.toDouble(),
+    top: t?.toDouble(),
+    right: r?.toDouble(),
+    bottom: b?.toDouble(),
+    width: w?.toDouble(),
+    height: h?.toDouble(),
+    child: c,
+  );
+}
+
+Positioned positionedFill(Widget c, {num? l, num? t, num? r, num? b}) {
+  return Positioned.fill(
+    left: l?.toDouble(),
+    top: t?.toDouble(),
+    right: r?.toDouble(),
+    bottom: b?.toDouble(),
+    child: c,
+  );
+}
+
+Widget adaptive({
+  Widget? general,
+  Widget? ios,
+  Widget? android,
+  Widget? web,
+  Widget? desktop,
+}) {
+  if ([general, ios, android, web, desktop].map((e) => e != null).isEmpty) {
+    throw IllegalArgumentError();
+  }
+  Widget? platformWidget;
+
+  if (kIsWeb) {
+    platformWidget = web;
+  } else if (Platform.isAndroid) {
+    platformWidget = android;
+  } else if (Platform.isIOS) {
+    platformWidget = ios;
+  } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    platformWidget = desktop;
+  }
+
+  if (platformWidget != null) {
+    return platformWidget;
+  }
+
+  if (general != null) {
+    return general;
+  }
+
+  return (ios ?? android ?? web ?? desktop)!;
+}
+
+Widget dot(Color c, double s) => Container(
+  width: s,
+  height: s,
+  decoration: BoxDecoration(shape: BoxShape.circle, color: c),
+);
+
+Padding padding(EdgeInsets p, Widget c) => Padding(padding: p, child: c);
+
+@Deprecated("some problem needed to be fix")
+Future<dynamic> pushScene(scene, ctx) =>
+    Navigator.push(ctx, MaterialPageRoute(builder: (_) => scene));
+
+void popPage(ctx) => Navigator.pop(ctx);
+
+Widget flexible(
+  BuildContext ctx, {
+  Widget? desktop,
+  Widget? mobile,
+  Widget? web,
+  Widget? general,
+}) {
+  final Size size = MediaQuery.of(ctx).size;
+  final double width = size.width;
+
+  const double desktopBreakpoint = 1024;
+  const double webBreakpoint = 600; // maybe tablet/large phone
+
+  Widget? chosen;
+
+  if (width >= desktopBreakpoint) {
+    chosen = desktop ?? general;
+  } else if (width >= webBreakpoint) {
+    chosen = web ?? general;
+  } else {
+    chosen = mobile ?? general;
+  }
+
+  chosen ??= const SizedBox.shrink();
+
+  return chosen;
+}

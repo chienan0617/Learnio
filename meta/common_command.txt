@@ -1,0 +1,10 @@
+flutter clean -v
+flutter pub get -v
+
+dart run flutter_native_splash:create
+dart run flutter_launcher_icons:main
+
+dart run build_runner build -v
+
+flutter build web --release --wasm --tree-shake-icons -v --base-href "/learnio_web/"
+flutter build apk --release -v
