@@ -74,12 +74,16 @@ class _ChatPageState extends State<ChatPage> {
 
         // 輸入區
         ChatInputBar(
+          chatController: _chat,
           onSend: (content) => _chat.sendMessage(content),
           onVoicePressed: () {
             // TODO: 語音輸入
           },
-          onAttachPressed: () {
-            // TODO: 附件
+          onFilesSelected: (files) {
+            // TODO: 處理選擇的文件
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('已選擇 ${files.length} 個檔案')),
+            );
           },
         ),
       ],
@@ -109,14 +113,6 @@ class _ChatPageState extends State<ChatPage> {
               Scaffold.of(context).openDrawer();
             },
             icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
-          ),
-
-          const Spacer(),
-
-          // 模型選擇
-          ModelSelector(
-            chatController: _chat,
-            onChanged: () => setState(() {}),
           ),
 
           const Spacer(),

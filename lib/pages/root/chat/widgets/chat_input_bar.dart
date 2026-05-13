@@ -1,16 +1,21 @@
 import 'package:learnio/base.dart';
+import 'package:learnio/script/controller/chat/chat_controller.dart';
+import 'package:learnio/pages/root/chat/widgets/model_selector.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ChatInputBar extends StatefulWidget {
+  final ChatController chatController;
   final void Function(String content) onSend;
   final VoidCallback? onVoicePressed;
-  final VoidCallback? onAttachPressed;
+  final void Function(List<PlatformFile> files)? onFilesSelected;
   final String? hintText;
 
   const ChatInputBar({
     super.key,
+    required this.chatController,
     required this.onSend,
     this.onVoicePressed,
-    this.onAttachPressed,
+    this.onFilesSelected,
     this.hintText,
   });
 
@@ -75,35 +80,56 @@ class _ChatInputBarState extends State<ChatInputBar> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 輸入區
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                // 附件按鈕
-                Padding(
-                  padding: const EdgeInsets.only(left: DesignSystem.space4, bottom: DesignSystem.space4),
-                  child: IconButton(
-                    onPressed: () {
+            // 模型選擇與附件預覽 (頂部工具列)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: DesignSystem.space12,
+                vertical: DesignSystem.space8,
+              ),
+              child: Row(
+                children: [
+                  ModelSelector(
+                    chatController: widget.chatController,
+                    onChanged: () => setState(() {}),
+                  ),
+                  const Spacer(),
+                  // 附件按鈕
+                  IconButton(
+                    onPressed: () async {
                       HapticFeedback.lightImpact();
-                      widget.onAttachPressed?.call();
+                      // final result = await FilePicker.platform.pickFiles(
+                      //   allowMultiple: true,
+                      // );
+                      // if (result != null) {
+                      //   widget.onFilesSelected?.call(result.files);
+                      // }
                     },
                     icon: Icon(
                       Icons.add_circle_outline_rounded,
                       color: tx6,
-                      size: 24,
+                      size: 22,
                     ),
                     splashRadius: 20,
                     padding: const EdgeInsets.all(DesignSystem.space8),
                     constraints: const BoxConstraints(),
                   ),
-                ),
+                ],
+              ),
+            ),
 
+            Divider(color: bg3.withOpacity(0.3), height: 1),
+
+            // 輸入區
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const SizedBox(width: DesignSystem.space12),
                 // 文字輸入框
                 Expanded(
                   child: TextField(
                     controller: _textController,
                     focusNode: _focusNode,
-                    style: tsBodyLarge.copyWith(fontSize: 15),
+                    style: tsBodyLarge.copyWith(fontSize: 17),
                     maxLines: 5,
                     minLines: 1,
                     textInputAction: TextInputAction.newline,
@@ -111,7 +137,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                       hintText: widget.hintText ?? '詢問任何問題...',
                       hintStyle: tsBodyLarge.copyWith(
                         color: tx6.withOpacity(0.5),
-                        fontSize: 15,
+                        fontSize: 17,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
@@ -125,15 +151,16 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
                 // 語音按鈕 / 送出按鈕
                 Padding(
-                  padding: const EdgeInsets.only(right: DesignSystem.space8, bottom: DesignSystem.space8),
+                  padding: const EdgeInsets.only(
+                    right: DesignSystem.space8,
+                    bottom: DesignSystem.space8,
+                  ),
                   child: AnimatedSwitcher(
                     duration: DesignSystem.animFast,
                     transitionBuilder: (child, anim) {
                       return ScaleTransition(scale: anim, child: child);
                     },
-                    child: _hasText
-                        ? _buildSendButton()
-                        : _buildVoiceButton(),
+                    child: _hasText ? _buildSendButton() : _buildVoiceButton(),
                   ),
                 ),
               ],
@@ -183,11 +210,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
         HapticFeedback.lightImpact();
         widget.onVoicePressed?.call();
       },
-      icon: Icon(
-        Icons.mic_none_rounded,
-        color: tx6,
-        size: 24,
-      ),
+      icon: Icon(Icons.mic_none_rounded, color: tx6, size: 24),
       splashRadius: 20,
       padding: const EdgeInsets.all(DesignSystem.space8),
       constraints: const BoxConstraints(),

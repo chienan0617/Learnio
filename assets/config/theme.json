@@ -1,57 +1,57 @@
 {
   "dark_mode": true,
   "primary": [
-    "#7C3AED",
-    "#2563EB"
+    "#2563EB",
+    "#60A5FA"
   ],
   "secondary": [
-    "#6366F1",
+    "#93C5FD",
     "#1E40AF"
   ],
   "tertiary": [
-    "#4F46E5",
+    "#1D4ED8",
     "#1E3A8A"
   ],
   "normal": [
-    "#F5F3FF",
+    "#DBEAFE",
     "#DBEAFE"
   ],
-  "debug_color": "#8B5CF6",
-  "debug_color_2": "#C4B5FD",
-  "default_font_family": "Inter",
+  "debug_color": "#3B82F6",
+  "debug_color_2": "#93C5FD",
+  "default_font_family": "Space Grotesk",
   "enable_debug_box": false,
-  "enable_liquid_glass": false,
+  "enable_liquid_glass": true,
   "bg1": [
-    "#0D0D0E",
-    "#F9FAFB"
+    "#09090B",
+    "#F4F6FA"
   ],
   "bg1_5": [
-    "#171719",
-    "#F3F4F6"
+    "#18181B",
+    "#E5EAF2"
   ],
   "bg2": [
-    "#222224",
-    "#E5E7EB"
+    "#27272A",
+    "#D8E0EA"
   ],
   "bg3": [
-    "#2E2E30",
-    "#D1D5DB"
+    "#3F3F46",
+    "#C9D3E1"
   ],
   "bg4": [
-    "#3F3F41",
-    "#9CA3AF"
+    "#52525B",
+    "#B5C2D4"
   ],
   "bg5": [
-    "#525254",
-    "#6B7280"
+    "#71717A",
+    "#9DB0C7"
   ],
   "so1": [
-    "#7C3AED",
+    "#3B82F6",
     "#BFDBFE"
   ],
   "tx1": [
-    "#F9FAFB",
-    "#111827"
+    "#FFFFFF",
+    "#0B0F17"
   ],
   "tx1p": [
     "#FFFFFF",
@@ -59,38 +59,38 @@
   ],
   "tx2": [
     "#E5E7EB",
-    "#374151"
+    "#1F2937"
   ],
   "tx2p": [
-    "#C4B5FD",
-    "#4338CA"
+    "#93C5FD",
+    "#1D4ED8"
   ],
   "tx3": [
-    "#A5B4FC",
-    "#2563EB"
+    "#60A5FA",
+    "#3B82F6"
   ],
   "tx4": [
-    "#818CF8",
-    "#4F46E5"
+    "#93C5FD",
+    "#2563EB"
   ],
   "tx5": [
-    "#6366F1",
-    "#6366F1"
+    "#1D4ED8",
+    "#1D4ED8"
   ],
   "tx6": [
-    "#9CA3AF",
-    "#6B7280"
+    "#94A3B8",
+    "#64748B"
   ],
   "tx6p": [
-    "#6B7280",
-    "#4B5563"
+    "#718096",
+    "#5B6473"
   ],
   "background1": [
-    "#0D0D0E",
-    "#F9FAFB"
+    "#09090B",
+    "#F4F6FA"
   ],
   "background2": [
-    "#7C3AED",
+    "#3B82F6",
     "#2563EB"
   ],
   "background3": [
@@ -98,7 +98,7 @@
     "#FFFFFF"
   ],
   "background4": [
-    "#171719",
-    "#F3F4F6"
+    "#18181B",
+    "#E5EAF2"
   ]
 }

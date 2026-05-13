@@ -1,5 +1,6 @@
 import 'package:learnio/base.dart';
 import 'package:learnio/script/types/chat_message.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class MessageBubble extends StatefulWidget {
   final ChatMessage message;
@@ -117,11 +118,26 @@ class _MessageBubbleState extends State<MessageBubble>
                     width: 0.5,
                   ),
                 ),
-                child: SelectableText(
-                  msg.content,
-                  style: tsBodyLarge.copyWith(
-                    fontSize: 15,
-                    color: isUser ? tx1 : tx1.withOpacity(0.95),
+                child: MarkdownBody(
+                  data: msg.content,
+                  selectable: true,
+                  styleSheet: MarkdownStyleSheet(
+                    p: tsBodyLarge.copyWith(
+                      fontSize: 17,
+                      color: isUser ? tx1 : tx1.withOpacity(0.95),
+                    ),
+                    h1: tsTitleLarge.copyWith(fontSize: 24),
+                    h2: tsTitleLarge.copyWith(fontSize: 22),
+                    h3: tsTitleLarge.copyWith(fontSize: 20),
+                    listBullet: tsBodyLarge.copyWith(fontSize: 17, color: primary),
+                    code: tsBodyMedium.copyWith(
+                      backgroundColor: bg3.withOpacity(0.3),
+                      fontFamily: 'monospace',
+                    ),
+                    codeblockDecoration: BoxDecoration(
+                      color: bg3.withOpacity(0.2),
+                      borderRadius: DesignSystem.borderS,
+                    ),
                   ),
                 ),
               ),
