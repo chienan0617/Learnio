@@ -1,5 +1,16 @@
 import 'package:learnio/base.dart';
+import 'package:learnio/script/controller/chat/chat_controller.dart';
+import 'package:learnio/script/controller/chat/conversation_controller.dart';
+import 'package:learnio/script/controller/chat/project_controller.dart';
+import 'package:learnio/script/controller/chat/favorite_controller.dart';
+import 'package:learnio/script/controller/chat/learning_controller.dart';
+import 'package:learnio/script/controller/chat/search_controller.dart';
 import 'package:learnio/pages/root/side_bar.dart';
+import 'package:learnio/pages/root/chat/chat_page.dart';
+import 'package:learnio/pages/root/project/project_page.dart';
+import 'package:learnio/pages/root/favorite/favorite_page.dart';
+import 'package:learnio/pages/root/learning/learning_page.dart';
+import 'package:learnio/pages/root/settings/settings_page.dart';
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -9,88 +20,94 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  // Controllers
+  late final ConversationController _convController;
+  late final ChatController _chatController;
+  late final ProjectController _projectController;
+  late final FavoriteController _favoriteController;
+  late final LearningController _learningController;
+  late final AppSearchController _searchController;
+
+  String _currentPage = 'chat';
+
   @override
   void initState() {
     super.initState();
-    Rebuild.register("root", () => setState(() {}));
+    Rebuild.register('root', () => setState(() {}));
+
+    _convController = ConversationController();
+    _chatController = ChatController(_convController);
+    _projectController = ProjectController();
+    _favoriteController = FavoriteController();
+    _learningController = LearningController();
+    _searchController = AppSearchController();
+
+    _convController.onStateChanged = () {
+      if (mounted) setState(() {});
+    };
+  }
+
+  void _navigateTo(String pageKey) {
+    setState(() => _currentPage = pageKey);
+  }
+
+  void _selectConversation(String conversationId) {
+    _convController.selectConversation(conversationId);
+    setState(() => _currentPage = 'chat');
+  }
+
+  void _startNewConversation() {
+    _convController.startNewConversation();
+    setState(() => _currentPage = 'chat');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: SideBar(),
       backgroundColor: bg1,
-      body: box(),
-      // ignore: dead_code
-      bottomNavigationBar: true
-          ? box()
-          // ignore: dead_code
-          : Container(
-              decoration: BoxDecoration(
-                color: bg3,
-                border: Border(
-                  top: BorderSide(
-                    color: tx2, // 或 tx2.withOpacity(0.2)
-                    width: 0.25,
-                  ),
-                ),
-              ),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                ),
-                child: BottomNavigationBar(
-                  items: [
-                    item(Icons.home, Icons.home, "Home", 0),
-                    item(
-                      Icons.calendar_today,
-                      Icons.calendar_today,
-                      "Calendar",
-                      1,
-                    ),
-                    item(
-                      Icons.assistant_outlined,
-                      Icons.assistant_outlined,
-                      "AI Agent",
-                      2,
-                    ),
-                    item(Icons.person, Icons.person, "Person", 3),
-                  ],
-                  elevation: 0,
-                  backgroundColor: bg1,
-                  selectedFontSize: 12,
-                  unselectedFontSize: 12,
-                  selectedItemColor: primary,
-                  unselectedItemColor: tx2,
-                  selectedLabelStyle: TextStyle(color: tx1, fontFamily: faSg),
-                  onTap: PageNavigation.onChange,
-                  currentIndex: PageNavigation.currentIndex,
-                  type: BottomNavigationBarType.fixed,
-                ),
-              ),
-            ),
+      drawer: SideBar(
+        conversationController: _convController,
+        searchController: _searchController,
+        projectController: _projectController,
+        onNavigate: _navigateTo,
+        onSelectConversation: _selectConversation,
+        onNewConversation: _startNewConversation,
+      ),
+      body: _buildCurrentPage(),
     );
   }
 
-  BottomNavigationBarItem item(
-    IconData icon,
-    IconData iconSelected,
-    String label,
-    int index,
-  ) {
-    return BottomNavigationBarItem(
-      icon: Column(
-        children: [
-          Icon(
-            PageNavigation.currentIndex == index ? iconSelected : icon,
-            size: 26,
-          ),
-          height(2.5),
-          // height(5),
-        ],
-      ),
-      label: label, //Language.word(label),
-    );
+  Widget _buildCurrentPage() {
+    switch (_currentPage) {
+      case 'chat':
+        return ChatPage(
+          chatController: _chatController,
+          conversationController: _convController,
+          learningController: _learningController,
+        );
+      case 'project':
+        return ProjectPage(
+          projectController: _projectController,
+          onOpenConversation: _selectConversation,
+        );
+      case 'favorite':
+        return FavoritePage(
+          favoriteController: _favoriteController,
+          conversationController: _convController,
+          onOpenConversation: _selectConversation,
+        );
+      case 'learning':
+        return LearningPage(
+          learningController: _learningController,
+        );
+      case 'settings':
+        return const SettingsPage();
+      default:
+        return ChatPage(
+          chatController: _chatController,
+          conversationController: _convController,
+          learningController: _learningController,
+        );
+    }
   }
 }
