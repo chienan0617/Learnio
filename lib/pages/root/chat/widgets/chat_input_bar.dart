@@ -54,10 +54,10 @@ class _ChatInputBarState extends State<ChatInputBar> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
+        left: DesignSystem.space12,
+        right: DesignSystem.space12,
+        top: DesignSystem.space12,
+        bottom: MediaQuery.of(context).padding.bottom + DesignSystem.space16,
       ),
       decoration: BoxDecoration(
         color: bg1,
@@ -68,8 +68,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
       child: Container(
         decoration: BoxDecoration(
           color: bg2,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: DesignSystem.borderXL,
           border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+          boxShadow: DesignSystem.shadowSoft,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -80,7 +81,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
               children: [
                 // 附件按鈕
                 Padding(
-                  padding: const EdgeInsets.only(left: 4, bottom: 4),
+                  padding: const EdgeInsets.only(left: DesignSystem.space4, bottom: DesignSystem.space4),
                   child: IconButton(
                     onPressed: () {
                       HapticFeedback.lightImpact();
@@ -89,10 +90,10 @@ class _ChatInputBarState extends State<ChatInputBar> {
                     icon: Icon(
                       Icons.add_circle_outline_rounded,
                       color: tx6,
-                      size: 22,
+                      size: 24,
                     ),
                     splashRadius: 20,
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(DesignSystem.space8),
                     constraints: const BoxConstraints(),
                   ),
                 ),
@@ -102,25 +103,20 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   child: TextField(
                     controller: _textController,
                     focusNode: _focusNode,
-                    style: TextStyle(
-                      color: tx1,
-                      fontSize: 15,
-                      fontWeight: fw4,
-                    ),
+                    style: tsBodyLarge.copyWith(fontSize: 15),
                     maxLines: 5,
                     minLines: 1,
                     textInputAction: TextInputAction.newline,
                     decoration: InputDecoration(
                       hintText: widget.hintText ?? '詢問任何問題...',
-                      hintStyle: TextStyle(
-                        color: tx6.withOpacity(0.6),
+                      hintStyle: tsBodyLarge.copyWith(
+                        color: tx6.withOpacity(0.5),
                         fontSize: 15,
-                        fontWeight: fw4,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 12,
+                        horizontal: DesignSystem.space8,
+                        vertical: DesignSystem.space12,
                       ),
                     ),
                     cursorColor: primary,
@@ -129,9 +125,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
                 // 語音按鈕 / 送出按鈕
                 Padding(
-                  padding: const EdgeInsets.only(right: 4, bottom: 4),
+                  padding: const EdgeInsets.only(right: DesignSystem.space8, bottom: DesignSystem.space8),
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
+                    duration: DesignSystem.animFast,
                     transitionBuilder: (child, anim) {
                       return ScaleTransition(scale: anim, child: child);
                     },
@@ -157,7 +153,14 @@ class _ChatInputBarState extends State<ChatInputBar> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: DesignSystem.borderL,
+        boxShadow: [
+          BoxShadow(
+            color: primary.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: IconButton(
         onPressed: _handleSend,
@@ -167,7 +170,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
           size: 20,
         ),
         splashRadius: 20,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(DesignSystem.space8),
         constraints: const BoxConstraints(),
       ),
     );
@@ -183,10 +186,10 @@ class _ChatInputBarState extends State<ChatInputBar> {
       icon: Icon(
         Icons.mic_none_rounded,
         color: tx6,
-        size: 22,
+        size: 24,
       ),
       splashRadius: 20,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(DesignSystem.space8),
       constraints: const BoxConstraints(),
     );
   }

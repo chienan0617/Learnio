@@ -50,8 +50,10 @@ class _SideBarState extends State<SideBar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.82,
+      width: MediaQuery.of(context).size.width * 0.85,
       backgroundColor: bg1,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: SafeArea(
         child: Column(
           children: [
@@ -60,6 +62,7 @@ class _SideBarState extends State<SideBar> {
             Expanded(
               child: _isSearching ? _buildSearchResults() : _buildMainMenu(),
             ),
+            const Divider(height: 1, thickness: 0.5, color: Colors.white10),
             _buildFooter(),
           ],
         ),
@@ -69,25 +72,33 @@ class _SideBarState extends State<SideBar> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      padding: const EdgeInsets.fromLTRB(
+          DesignSystem.space20, DesignSystem.space20, DesignSystem.space20, DesignSystem.space12),
       child: Row(
         children: [
           // Logo
           Container(
-            width: 40, height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [primary, secondary],
-                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: DesignSystem.borderM,
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Icon(Icons.auto_awesome, size: 22, color: Colors.white),
+            child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
           ),
-          const SizedBox(width: 12),
-          Text('Learnio', style: TextStyle(
-            color: tx1, fontSize: 22, fontWeight: fw8, letterSpacing: -0.5,
-          )),
+          const SizedBox(width: DesignSystem.space12),
+          Text('Learnio', style: tsTitleLarge),
           const Spacer(),
           // 新對話按鈕
           InkWell(
@@ -96,14 +107,15 @@ class _SideBarState extends State<SideBar> {
               widget.onNewConversation();
               Navigator.pop(context);
             },
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: DesignSystem.borderM,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(DesignSystem.space8),
               decoration: BoxDecoration(
-                color: bg2, borderRadius: BorderRadius.circular(10),
+                color: bg2,
+                borderRadius: DesignSystem.borderM,
                 border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
               ),
-              child: Icon(Icons.edit_square, size: 18, color: tx2),
+              child: Icon(Icons.edit_square, size: 20, color: tx1),
             ),
           ),
         ],
@@ -113,21 +125,23 @@ class _SideBarState extends State<SideBar> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space16, vertical: DesignSystem.space8),
       child: Container(
         decoration: BoxDecoration(
-          color: bg2, borderRadius: BorderRadius.circular(12),
+          color: bg2,
+          borderRadius: DesignSystem.borderXL,
           border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
         ),
         child: TextField(
           controller: _searchCtrl,
           onChanged: _onSearch,
-          style: TextStyle(color: tx1, fontSize: 14),
+          style: tsBodyMedium.copyWith(color: tx1),
           cursorColor: primary,
           decoration: InputDecoration(
             hintText: '搜尋對話...',
-            hintStyle: TextStyle(color: tx6.withOpacity(0.5), fontSize: 14),
-            prefixIcon: Icon(Icons.search_rounded, color: tx6, size: 18),
+            hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
+            prefixIcon: Icon(Icons.search_rounded, color: tx6, size: 20),
             suffixIcon: _isSearching
                 ? IconButton(
                     icon: Icon(Icons.close_rounded, color: tx6, size: 18),
@@ -138,7 +152,7 @@ class _SideBarState extends State<SideBar> {
                   )
                 : null,
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
         ),
       ),
@@ -150,7 +164,8 @@ class _SideBarState extends State<SideBar> {
     final currentId = widget.conversationController.current?.id;
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space12, vertical: DesignSystem.space8),
       children: [
         // 功能選單
         _menuItem(Icons.chat_rounded, '聊天', 'chat'),
@@ -161,12 +176,13 @@ class _SideBarState extends State<SideBar> {
 
         // 分隔線
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          padding: const EdgeInsets.fromLTRB(
+              DesignSystem.space8, DesignSystem.space20, DesignSystem.space8, DesignSystem.space8),
           child: Row(children: [
-            Text('最近對話', style: TextStyle(color: tx6, fontSize: 12, fontWeight: fw6)),
+            Text('最近對話', style: tsCaption.copyWith(fontWeight: fw7)),
             const Spacer(),
             Text('${conversations.length}',
-                style: TextStyle(color: tx6.withOpacity(0.5), fontSize: 11)),
+                style: tsCaption.copyWith(color: tx6.withOpacity(0.5))),
           ]),
         ),
 
@@ -177,7 +193,7 @@ class _SideBarState extends State<SideBar> {
             margin: const EdgeInsets.only(bottom: 4),
             decoration: BoxDecoration(
               color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: DesignSystem.borderM,
             ),
             child: ListTile(
               onTap: () {
@@ -194,15 +210,15 @@ class _SideBarState extends State<SideBar> {
               leading: Icon(Icons.chat_bubble_outline_rounded,
                   size: 16, color: isActive ? primary : tx6),
               title: Text(conv.title,
-                  style: TextStyle(
+                  style: tsBodyMedium.copyWith(
                     color: isActive ? tx1 : tx2,
-                    fontSize: 13, fontWeight: isActive ? fw6 : fw4,
+                    fontWeight: isActive ? fw6 : fw4,
                   ),
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
               subtitle: Text(conv.timeLabel,
-                  style: TextStyle(color: tx6.withOpacity(0.6), fontSize: 11)),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                  style: tsCaption.copyWith(fontSize: 10, color: tx6.withOpacity(0.6))),
+              shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
             ),
           );
         }),
@@ -220,10 +236,11 @@ class _SideBarState extends State<SideBar> {
           Navigator.pop(context);
         },
         dense: true,
-        leading: Icon(icon, size: 20, color: tx2),
-        title: Text(title, style: TextStyle(color: tx1, fontSize: 14, fontWeight: fw5)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        leading: Icon(icon, size: 22, color: tx1.withOpacity(0.8)),
+        title: Text(title, style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6)),
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
         hoverColor: bg2,
+        splashColor: primary.withOpacity(0.1),
       ),
     );
   }
@@ -231,12 +248,13 @@ class _SideBarState extends State<SideBar> {
   Widget _buildSearchResults() {
     if (_searchResults.isEmpty) {
       return Center(
-        child: Text('找不到結果', style: TextStyle(color: tx6, fontSize: 14)),
+        child: Text('找不到結果', style: tsBodyMedium.copyWith(color: tx6)),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space12, vertical: DesignSystem.space8),
       itemCount: _searchResults.length,
       itemBuilder: (_, i) {
         final r = _searchResults[i];
@@ -263,11 +281,12 @@ class _SideBarState extends State<SideBar> {
           dense: true,
           leading: Icon(icon, size: 18, color: tx6),
           title: Text(r.title,
-              style: TextStyle(color: tx1, fontSize: 13, fontWeight: fw5),
-              maxLines: 1, overflow: TextOverflow.ellipsis),
+              style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
           subtitle: Text(r.subtitle,
-              style: TextStyle(color: tx6, fontSize: 12),
-              maxLines: 2, overflow: TextOverflow.ellipsis),
+              style: tsCaption, maxLines: 2, overflow: TextOverflow.ellipsis),
+          shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
         );
       },
     );
@@ -275,20 +294,47 @@ class _SideBarState extends State<SideBar> {
 
   Widget _buildFooter() {
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-        decoration: BoxDecoration(
-          color: bg2, borderRadius: BorderRadius.circular(10),
+      padding: const EdgeInsets.all(DesignSystem.space16),
+      child: InkWell(
+        onTap: () {
+          // TODO: 使用者資訊
+        },
+        borderRadius: DesignSystem.borderM,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+              vertical: DesignSystem.space12, horizontal: DesignSystem.space12),
+          decoration: BoxDecoration(
+            color: bg2,
+            borderRadius: DesignSystem.borderM,
+            border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+          ),
+          child: Row(children: [
+            // 頭像佔位
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: primary.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.person_rounded, size: 20, color: primary),
+            ),
+            const SizedBox(width: DesignSystem.space12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Premium User',
+                      style: tsBodyMedium.copyWith(fontWeight: fw7, fontSize: 13)),
+                  Text('Version ${System.version}',
+                      style: tsCaption.copyWith(fontSize: 10, color: tx6)),
+                ],
+              ),
+            ),
+            const SizedBox(width: DesignSystem.space8),
+            buildAlphaTag(),
+          ]),
         ),
-        child: Row(children: [
-          Icon(Icons.vibration_rounded, size: 12, color: tx6.withOpacity(0.4)),
-          const SizedBox(width: 8),
-          Text('Version ${System.version}',
-              style: TextStyle(color: tx6.withOpacity(0.5), fontSize: 11, fontWeight: fw5)),
-          const Spacer(),
-          buildAlphaTag(),
-        ]),
       ),
     );
   }
@@ -298,13 +344,14 @@ class _SideBarState extends State<SideBar> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: bg1_5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('刪除對話？', style: TextStyle(color: tx1, fontWeight: fw7)),
-        content: Text('確定要刪除「$title」嗎？', style: TextStyle(color: tx2)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: Text('刪除對話？', style: tsTitleLarge),
+        content: Text('確定要刪除「$title」嗎？', style: tsBodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('取消', style: TextStyle(color: tx6)),
+            child: Text('取消', style: tsBodyMedium.copyWith(color: tx6)),
           ),
           TextButton(
             onPressed: () {
@@ -312,7 +359,7 @@ class _SideBarState extends State<SideBar> {
               Navigator.pop(ctx);
               setState(() {});
             },
-            child: Text('刪除', style: TextStyle(color: CommonColors.error)),
+            child: Text('刪除', style: tsBodyMedium.copyWith(color: CommonColors.error)),
           ),
         ],
       ),
@@ -325,7 +372,7 @@ Widget buildAlphaTag() {
     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
     decoration: BoxDecoration(
       color: Colors.orangeAccent.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: DesignSystem.borderS,
       border: Border.all(color: Colors.orangeAccent.withOpacity(0.3), width: 0.5),
     ),
     child: const Text('ALPHA',

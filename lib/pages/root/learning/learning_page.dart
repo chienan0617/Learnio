@@ -34,26 +34,8 @@ class _LearningPageState extends State<LearningPage> {
           _buildSearchBar(),
           Expanded(
             child: items.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.school_outlined, size: 64,
-                            color: tx6.withOpacity(0.3)),
-                        const SizedBox(height: 16),
-                        Text('學習庫是空的',
-                            style: TextStyle(color: tx6, fontSize: 16, fontWeight: fw5)),
-                        const SizedBox(height: 8),
-                        Text('從 AI 回應中儲存知識到這裡',
-                            style: TextStyle(color: tx6.withOpacity(0.6), fontSize: 13)),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: items.length,
-                    itemBuilder: (_, i) => _buildCard(items[i]),
-                  ),
+                ? _buildEmptyState()
+                : _buildLearningList(items),
           ),
         ],
       ),
@@ -63,17 +45,19 @@ class _LearningPageState extends State<LearningPage> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 20, right: 20, bottom: 8,
+        top: MediaQuery.of(context).padding.top + DesignSystem.space12,
+        left: DesignSystem.space12,
+        right: DesignSystem.space20,
+        bottom: DesignSystem.space8,
       ),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 24),
+            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
           ),
-          const SizedBox(width: 12),
-          Text('學習庫', style: TextStyle(color: tx1, fontSize: 24, fontWeight: fw8)),
+          const SizedBox(width: DesignSystem.space8),
+          Text('學習庫', style: tsTitleLarge.copyWith(fontSize: 24)),
         ],
       ),
     );
@@ -81,19 +65,21 @@ class _LearningPageState extends State<LearningPage> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space20, vertical: DesignSystem.space12),
       child: Container(
         decoration: BoxDecoration(
-          color: bg2, borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+          color: bg2,
+          borderRadius: DesignSystem.borderXL,
+          border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
         ),
         child: TextField(
-          style: TextStyle(color: tx1, fontSize: 14),
+          style: tsBodyMedium.copyWith(color: tx1),
           cursorColor: primary,
           onChanged: (v) => setState(() => _searchQuery = v),
           decoration: InputDecoration(
             hintText: '搜尋學習筆記...',
-            hintStyle: TextStyle(color: tx6.withOpacity(0.6), fontSize: 14),
+            hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
             prefixIcon: Icon(Icons.search_rounded, color: tx6, size: 20),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -103,47 +89,90 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(DesignSystem.space24),
+            decoration: BoxDecoration(
+              color: bg2,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.school_outlined, size: 48, color: tx6.withOpacity(0.3)),
+          ),
+          const SizedBox(height: DesignSystem.space24),
+          Text('學習庫是空的', style: tsTitleMedium.copyWith(color: tx6)),
+          const SizedBox(height: DesignSystem.space8),
+          Text('從 AI 回應中儲存知識到這裡', style: tsBodyMedium.copyWith(color: tx6.withOpacity(0.6))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLearningList(List<LearningItem> items) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
+      itemCount: items.length,
+      itemBuilder: (_, i) => _buildCard(items[i]),
+    );
+  }
+
   Widget _buildCard(LearningItem item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: DesignSystem.space16),
       decoration: BoxDecoration(
-        color: bg2, borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+        color: bg2,
+        borderRadius: DesignSystem.borderM,
+        border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
+        boxShadow: DesignSystem.shadowSoft,
       ),
       child: InkWell(
+        onTap: () {
+          // TODO: 查看詳情
+        },
         onLongPress: () => _showDeleteDialog(item),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: DesignSystem.borderM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(DesignSystem.space16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.lightbulb_outline_rounded, size: 18, color: primary),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(item.title,
-                      style: TextStyle(color: tx1, fontSize: 15, fontWeight: fw6),
-                      maxLines: 1, overflow: TextOverflow.ellipsis)),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(item.summary,
-                  style: TextStyle(color: tx2, fontSize: 13, height: 1.5),
-                  maxLines: 3, overflow: TextOverflow.ellipsis),
-              if (item.tags.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 6, runSpacing: 4,
-                  children: item.tags.map((t) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  Container(
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: DesignSystem.borderS,
                     ),
-                    child: Text(t,
-                        style: TextStyle(color: primary, fontSize: 11, fontWeight: fw5)),
-                  )).toList(),
+                    child: Icon(Icons.lightbulb_outline_rounded, size: 16, color: primary),
+                  ),
+                  const SizedBox(width: DesignSystem.space12),
+                  Expanded(
+                    child: Text(
+                      item.title,
+                      style: tsTitleMedium.copyWith(fontSize: 16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: DesignSystem.space12),
+              Text(
+                item.summary,
+                style: tsBodyMedium.copyWith(color: tx2, height: 1.6),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (item.tags.isNotEmpty) ...[
+                const SizedBox(height: DesignSystem.space16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: item.tags.map((t) => _buildTag(t)).toList(),
                 ),
               ],
             ],
@@ -153,25 +182,41 @@ class _LearningPageState extends State<LearningPage> {
     );
   }
 
+  Widget _buildTag(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: primary.withOpacity(0.08),
+        borderRadius: DesignSystem.borderS,
+        border: Border.all(color: primary.withOpacity(0.2), width: 0.5),
+      ),
+      child: Text(
+        tag,
+        style: tsCaption.copyWith(color: primary, fontWeight: fw7, fontSize: 11),
+      ),
+    );
+  }
+
   void _showDeleteDialog(LearningItem item) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: bg1_5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('刪除筆記？', style: TextStyle(color: tx1, fontWeight: fw7)),
-        content: Text('確定要刪除「${item.title}」嗎？', style: TextStyle(color: tx2)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: Text('刪除筆記？', style: tsTitleLarge),
+        content: Text('確定要刪除「${item.title}」嗎？', style: tsBodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('取消', style: TextStyle(color: tx6)),
+            child: Text('取消', style: tsBodyMedium.copyWith(color: tx6)),
           ),
           TextButton(
             onPressed: () {
               widget.learningController.deleteItem(item.id);
               Navigator.pop(ctx);
             },
-            child: Text('刪除', style: TextStyle(color: CommonColors.error)),
+            child: Text('刪除', style: tsBodyMedium.copyWith(color: CommonColors.error)),
           ),
         ],
       ),

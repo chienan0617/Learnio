@@ -42,7 +42,9 @@ class _ProjectPageState extends State<ProjectPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateDialog(context),
         backgroundColor: primary,
-        child: const Icon(Icons.add_rounded, color: Colors.white),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }
@@ -50,10 +52,10 @@ class _ProjectPageState extends State<ProjectPage> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 20,
-        right: 20,
-        bottom: 16,
+        top: MediaQuery.of(context).padding.top + DesignSystem.space12,
+        left: DesignSystem.space12,
+        right: DesignSystem.space20,
+        bottom: DesignSystem.space16,
       ),
       child: Row(
         children: [
@@ -62,17 +64,10 @@ class _ProjectPageState extends State<ProjectPage> {
               HapticFeedback.lightImpact();
               Scaffold.of(context).openDrawer();
             },
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 24),
+            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
           ),
-          const SizedBox(width: 12),
-          Text(
-            '專案',
-            style: TextStyle(
-              color: tx1,
-              fontSize: 24,
-              fontWeight: fw8,
-            ),
-          ),
+          const SizedBox(width: DesignSystem.space8),
+          Text('專案', style: tsTitleLarge.copyWith(fontSize: 24)),
         ],
       ),
     );
@@ -83,17 +78,18 @@ class _ProjectPageState extends State<ProjectPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.folder_open_rounded, size: 64, color: tx6.withOpacity(0.3)),
-          const SizedBox(height: 16),
-          Text(
-            '還沒有任何專案',
-            style: TextStyle(color: tx6, fontSize: 16, fontWeight: fw5),
+          Container(
+            padding: const EdgeInsets.all(DesignSystem.space24),
+            decoration: BoxDecoration(
+              color: bg2,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.folder_open_rounded, size: 48, color: tx6.withOpacity(0.5)),
           ),
-          const SizedBox(height: 8),
-          Text(
-            '建立專案來整理你的對話',
-            style: TextStyle(color: tx6.withOpacity(0.6), fontSize: 13),
-          ),
+          const SizedBox(height: DesignSystem.space24),
+          Text('還沒有任何專案', style: tsTitleMedium.copyWith(color: tx6)),
+          const SizedBox(height: DesignSystem.space8),
+          Text('建立專案來整理你的對話', style: tsBodyMedium.copyWith(color: tx6.withOpacity(0.6))),
         ],
       ),
     );
@@ -103,7 +99,7 @@ class _ProjectPageState extends State<ProjectPage> {
     final projects = widget.projectController.projects;
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
       itemCount: projects.length,
       itemBuilder: (context, index) {
         final proj = projects[index];
@@ -114,11 +110,12 @@ class _ProjectPageState extends State<ProjectPage> {
 
   Widget _buildProjectCard(model.Project proj) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: DesignSystem.space16),
       decoration: BoxDecoration(
         color: bg2,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+        borderRadius: DesignSystem.borderM,
+        border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
+        boxShadow: DesignSystem.shadowSoft,
       ),
       child: InkWell(
         onTap: () {
@@ -131,47 +128,36 @@ class _ProjectPageState extends State<ProjectPage> {
           HapticFeedback.mediumImpact();
           _showDeleteDialog(proj);
         },
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: DesignSystem.borderM,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(DesignSystem.space16),
           child: Row(
             children: [
               // 色塊圖示
               Container(
-                width: 48,
-                height: 48,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: proj.color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(14),
+                  color: proj.color.withOpacity(0.1),
+                  borderRadius: DesignSystem.borderM,
                 ),
                 child: Icon(
                   Icons.folder_rounded,
                   color: proj.color,
-                  size: 24,
+                  size: 26,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: DesignSystem.space16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      proj.name,
-                      style: TextStyle(
-                        color: tx1,
-                        fontSize: 16,
-                        fontWeight: fw6,
-                      ),
-                    ),
+                    Text(proj.name, style: tsTitleMedium.copyWith(fontSize: 16)),
                     if (proj.description.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: DesignSystem.space4),
                       Text(
                         proj.description,
-                        style: TextStyle(
-                          color: tx6,
-                          fontSize: 13,
-                          fontWeight: fw4,
-                        ),
+                        style: tsCaption.copyWith(fontSize: 13, color: tx6),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -183,16 +169,12 @@ class _ProjectPageState extends State<ProjectPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: bg3.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(10),
+                  color: bg3.withOpacity(0.3),
+                  borderRadius: DesignSystem.borderS,
                 ),
                 child: Text(
                   '${proj.conversationCount}',
-                  style: TextStyle(
-                    color: tx6,
-                    fontSize: 12,
-                    fontWeight: fw6,
-                  ),
+                  style: tsCaption.copyWith(fontWeight: fw7, color: tx2),
                 ),
               ),
             ],
@@ -210,48 +192,21 @@ class _ProjectPageState extends State<ProjectPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: bg1_5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('建立專案', style: TextStyle(color: tx1, fontWeight: fw7)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: Text('建立專案', style: tsTitleMedium),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: nameCtrl,
-              style: TextStyle(color: tx1),
-              cursorColor: primary,
-              decoration: InputDecoration(
-                hintText: '專案名稱',
-                hintStyle: TextStyle(color: tx6),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: bg3),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: primary),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: descCtrl,
-              style: TextStyle(color: tx1),
-              cursorColor: primary,
-              decoration: InputDecoration(
-                hintText: '描述（選填）',
-                hintStyle: TextStyle(color: tx6),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: bg3),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: primary),
-                ),
-              ),
-            ),
+            _buildTextField(nameCtrl, '專案名稱', autofocus: true),
+            const SizedBox(height: DesignSystem.space16),
+            _buildTextField(descCtrl, '描述（選填）'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('取消', style: TextStyle(color: tx6)),
+            child: Text('取消', style: tsBodyMedium.copyWith(color: tx6)),
           ),
           TextButton(
             onPressed: () {
@@ -263,9 +218,32 @@ class _ProjectPageState extends State<ProjectPage> {
                 Navigator.pop(ctx);
               }
             },
-            child: Text('建立', style: TextStyle(color: primary)),
+            child: Text('建立', style: tsBodyMedium.copyWith(color: primary, fontWeight: fw7)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController ctrl, String hint, {bool autofocus = false}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: bg2,
+        borderRadius: DesignSystem.borderM,
+        border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space16),
+      child: TextField(
+        controller: ctrl,
+        autofocus: autofocus,
+        style: tsBodyMedium.copyWith(color: tx1),
+        cursorColor: primary,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        ),
       ),
     );
   }
@@ -275,22 +253,21 @@ class _ProjectPageState extends State<ProjectPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: bg1_5,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('刪除專案？', style: TextStyle(color: tx1, fontWeight: fw7)),
-        content: Text('確定要刪除「${proj.name}」嗎？',
-            style: TextStyle(color: tx2)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: Text('刪除專案？', style: tsTitleLarge),
+        content: Text('確定要刪除「${proj.name}」嗎？', style: tsBodyMedium),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('取消', style: TextStyle(color: tx6)),
+            child: Text('取消', style: tsBodyMedium.copyWith(color: tx6)),
           ),
           TextButton(
             onPressed: () {
               widget.projectController.deleteProject(proj.id);
               Navigator.pop(ctx);
             },
-            child: Text('刪除',
-                style: TextStyle(color: CommonColors.error)),
+            child: Text('刪除', style: tsBodyMedium.copyWith(color: CommonColors.error)),
           ),
         ],
       ),

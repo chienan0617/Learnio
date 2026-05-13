@@ -48,6 +48,7 @@ class _RootPageState extends State<RootPage> {
   }
 
   void _navigateTo(String pageKey) {
+    if (_currentPage == pageKey) return;
     setState(() => _currentPage = pageKey);
   }
 
@@ -65,6 +66,7 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bg1,
+      drawerScrimColor: Colors.black54,
       drawer: SideBar(
         conversationController: _convController,
         searchController: _searchController,
@@ -73,7 +75,15 @@ class _RootPageState extends State<RootPage> {
         onSelectConversation: _selectConversation,
         onNewConversation: _startNewConversation,
       ),
-      body: _buildCurrentPage(),
+      body: AnimatedSwitcher(
+        duration: DesignSystem.animNormal,
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        child: Container(
+          key: ValueKey(_currentPage),
+          child: _buildCurrentPage(),
+        ),
+      ),
     );
   }
 

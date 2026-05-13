@@ -21,70 +21,74 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildHeader(context),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
               children: [
-                _sectionTitle('外觀'),
-                _toggleTile(
-                  icon: Icons.dark_mode_rounded,
-                  title: '深色模式',
-                  value: _isDarkMode,
-                  onChanged: (v) {
-                    setState(() => _isDarkMode = v);
-                    // darkMode = v;
-                  },
-                ),
-                _toggleTile(
-                  icon: Icons.vibration_rounded,
-                  title: '觸覺反饋',
-                  value: _hapticEnabled,
-                  onChanged: (v) => setState(() => _hapticEnabled = v),
-                ),
+                _buildSection('外觀', [
+                  _toggleTile(
+                    icon: Icons.dark_mode_rounded,
+                    title: '深色模式',
+                    value: _isDarkMode,
+                    onChanged: (v) {
+                      setState(() => _isDarkMode = v);
+                      // darkMode = v;
+                    },
+                  ),
+                  _toggleTile(
+                    icon: Icons.vibration_rounded,
+                    title: '觸覺反饋',
+                    value: _hapticEnabled,
+                    onChanged: (v) => setState(() => _hapticEnabled = v),
+                  ),
+                ]),
 
-                const SizedBox(height: 16),
-                _sectionTitle('一般'),
-                _navTile(
-                  icon: Icons.language_rounded,
-                  title: '語言',
-                  subtitle: _language,
-                  onTap: () {},
-                ),
-                _navTile(
-                  icon: Icons.auto_awesome,
-                  title: '預設模型',
-                  subtitle: 'Gemini 2.5 Pro',
-                  onTap: () {},
-                ),
+                const SizedBox(height: DesignSystem.space24),
+                _buildSection('一般', [
+                  _navTile(
+                    icon: Icons.language_rounded,
+                    title: '語言',
+                    subtitle: _language,
+                    onTap: () {},
+                  ),
+                  _navTile(
+                    icon: Icons.auto_awesome,
+                    title: '預設模型',
+                    subtitle: 'Gemini 2.5 Pro',
+                    onTap: () {},
+                  ),
+                ]),
 
-                const SizedBox(height: 16),
-                _sectionTitle('資料'),
-                _navTile(
-                  icon: Icons.download_rounded,
-                  title: '匯出對話記錄',
-                  onTap: () {},
-                ),
-                _navTile(
-                  icon: Icons.delete_outline_rounded,
-                  title: '清除所有資料',
-                  titleColor: CommonColors.error,
-                  onTap: () {},
-                ),
+                const SizedBox(height: DesignSystem.space24),
+                _buildSection('資料', [
+                  _navTile(
+                    icon: Icons.download_rounded,
+                    title: '匯出對話記錄',
+                    onTap: () {},
+                  ),
+                  _navTile(
+                    icon: Icons.delete_outline_rounded,
+                    title: '清除所有資料',
+                    titleColor: CommonColors.error,
+                    onTap: () {},
+                  ),
+                ]),
 
-                const SizedBox(height: 16),
-                _sectionTitle('關於'),
-                _navTile(
-                  icon: Icons.info_outline_rounded,
-                  title: '版本',
-                  subtitle: System.version,
-                  onTap: () {},
-                ),
-                _navTile(
-                  icon: Icons.code_rounded,
-                  title: '開發者',
-                  subtitle: 'PCET_CHIENAN0617',
-                  onTap: () {},
-                ),
+                const SizedBox(height: DesignSystem.space24),
+                _buildSection('關於', [
+                  _navTile(
+                    icon: Icons.info_outline_rounded,
+                    title: '版本',
+                    subtitle: System.version,
+                    onTap: () {},
+                  ),
+                  _navTile(
+                    icon: Icons.code_rounded,
+                    title: '開發者',
+                    subtitle: 'PCET_CHIENAN0617',
+                    onTap: () {},
+                  ),
+                ]),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 48),
               ],
             ),
           ),
@@ -96,28 +100,55 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 20, right: 20, bottom: 16,
+        top: MediaQuery.of(context).padding.top + DesignSystem.space12,
+        left: DesignSystem.space12,
+        right: DesignSystem.space20,
+        bottom: DesignSystem.space16,
       ),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 24),
+            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
           ),
-          const SizedBox(width: 12),
-          Text('設定', style: TextStyle(color: tx1, fontSize: 24, fontWeight: fw8)),
+          const SizedBox(width: DesignSystem.space8),
+          Text('設定', style: tsTitleLarge.copyWith(fontSize: 24)),
         ],
       ),
     );
   }
 
-  Widget _sectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, top: 8, bottom: 8),
-      child: Text(title,
-          style: TextStyle(color: tx6, fontSize: 13, fontWeight: fw6,
-              letterSpacing: 0.5)),
+  Widget _buildSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: DesignSystem.space12),
+          child: Text(
+            title,
+            style: tsCaption.copyWith(fontWeight: fw7, letterSpacing: 1.0, color: tx6),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: bg2,
+            borderRadius: DesignSystem.borderM,
+            border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
+            boxShadow: DesignSystem.shadowSoft,
+          ),
+          child: Column(
+            children: List.generate(children.length, (index) {
+              return Column(
+                children: [
+                  children[index],
+                  if (index < children.length - 1)
+                    Divider(height: 1, thickness: 0.5, color: bg3.withOpacity(0.3), indent: 56),
+                ],
+              );
+            }),
+          ),
+        ),
+      ],
     );
   }
 
@@ -127,22 +158,16 @@ class _SettingsPageState extends State<SettingsPage> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: bg2, borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
+    return ListTile(
+      leading: Icon(icon, color: tx2, size: 22),
+      title: Text(title, style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6)),
+      trailing: Switch.adaptive(
+        value: value,
+        onChanged: onChanged,
+        activeColor: primary,
       ),
-      child: ListTile(
-        leading: Icon(icon, color: tx2, size: 22),
-        title: Text(title, style: TextStyle(color: tx1, fontSize: 15, fontWeight: fw5)),
-        trailing: Switch.adaptive(
-          value: value,
-          onChanged: onChanged,
-          activeColor: primary,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: DesignSystem.space16, vertical: 2),
+      shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
     );
   }
 
@@ -153,22 +178,22 @@ class _SettingsPageState extends State<SettingsPage> {
     Color? titleColor,
     required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: bg2, borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
+    return ListTile(
+      onTap: onTap,
+      leading: Icon(icon, color: titleColor ?? tx2, size: 22),
+      title: Text(title,
+          style: tsBodyMedium.copyWith(color: titleColor ?? tx1, fontWeight: fw6)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (subtitle != null)
+            Text(subtitle, style: tsCaption.copyWith(color: tx6)),
+          const SizedBox(width: DesignSystem.space8),
+          Icon(Icons.chevron_right_rounded, color: tx6, size: 20),
+        ],
       ),
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, color: titleColor ?? tx2, size: 22),
-        title: Text(title,
-            style: TextStyle(color: titleColor ?? tx1, fontSize: 15, fontWeight: fw5)),
-        trailing: subtitle != null
-            ? Text(subtitle, style: TextStyle(color: tx6, fontSize: 13))
-            : Icon(Icons.chevron_right_rounded, color: tx6, size: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: DesignSystem.space16, vertical: 2),
+      shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
     );
   }
 }

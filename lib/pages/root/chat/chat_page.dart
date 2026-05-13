@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatPage> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: DesignSystem.animNormal,
           curve: Curves.easeOut,
         );
       }
@@ -89,10 +89,10 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildTopBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 8,
-        left: 16,
-        right: 16,
-        bottom: 8,
+        top: MediaQuery.of(context).padding.top + DesignSystem.space8,
+        left: DesignSystem.space12,
+        right: DesignSystem.space12,
+        bottom: DesignSystem.space8,
       ),
       decoration: BoxDecoration(
         color: bg1,
@@ -108,7 +108,7 @@ class _ChatPageState extends State<ChatPage> {
               HapticFeedback.lightImpact();
               Scaffold.of(context).openDrawer();
             },
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 24),
+            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
           ),
 
           const Spacer(),
@@ -128,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
               _conv.startNewConversation();
               setState(() {});
             },
-            icon: Icon(Icons.edit_square, color: tx1, size: 22),
+            icon: Icon(Icons.edit_square, color: tx1, size: 24),
           ),
         ],
       ),
@@ -136,56 +136,50 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space32, vertical: 64),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // AI Logo
             Container(
-              width: 72,
-              height: 72,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primary.withOpacity(0.8), secondary],
+                  colors: [primary, secondary],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: DesignSystem.borderXL,
                 boxShadow: [
                   BoxShadow(
-                    color: primary.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    color: primary.withOpacity(0.25),
+                    blurRadius: 30,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
               child: const Icon(
                 Icons.auto_awesome,
-                size: 36,
+                size: 40,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: DesignSystem.space32),
             Text(
               '有什麼想學的嗎？',
-              style: TextStyle(
-                color: tx1,
-                fontSize: 22,
-                fontWeight: fw7,
-              ),
+              style: tsDisplay.copyWith(fontSize: 24),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: DesignSystem.space12),
             Text(
-              '我是 Learnio，你的 AI 學習助手',
-              style: TextStyle(
-                color: tx6,
-                fontSize: 14,
-                fontWeight: fw4,
-              ),
+              '我是 Learnio，你的 AI 學習助手\n我可以幫你整理知識、回答問題或制定學習計劃',
+              style: tsBodyMedium.copyWith(color: tx6),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: DesignSystem.space32),
 
             // 建議問題
             ..._buildSuggestions(),
@@ -205,37 +199,34 @@ class _ChatPageState extends State<ChatPage> {
 
     return suggestions.map((s) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.only(bottom: DesignSystem.space12),
         child: InkWell(
           onTap: () {
             HapticFeedback.lightImpact();
             _chat.sendMessage(s.$2);
           },
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: DesignSystem.borderM,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(
+                horizontal: DesignSystem.space20, vertical: DesignSystem.space16),
             decoration: BoxDecoration(
               color: bg2,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+              borderRadius: DesignSystem.borderM,
+              border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
             ),
             child: Row(
               children: [
-                Text(s.$1, style: const TextStyle(fontSize: 18)),
-                const SizedBox(width: 12),
+                Text(s.$1, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: DesignSystem.space16),
                 Expanded(
                   child: Text(
                     s.$2,
-                    style: TextStyle(
-                      color: tx2,
-                      fontSize: 14,
-                      fontWeight: fw4,
-                    ),
+                    style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw5),
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios_rounded,
-                    size: 14, color: tx6.withOpacity(0.5)),
+                    size: 14, color: tx6.withOpacity(0.4)),
               ],
             ),
           ),
@@ -247,7 +238,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: DesignSystem.space8),
       itemCount: _chat.messages.length + (_chat.isGenerating ? 1 : 0),
       itemBuilder: (context, index) {
         // 最後一個是打字指示器
@@ -272,11 +263,12 @@ class _ChatPageState extends State<ChatPage> {
             );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('已儲存到學習庫'),
-                backgroundColor: bg3,
+                content: Text('已儲存到學習庫', style: tsBodyMedium.copyWith(color: Colors.white)),
+                backgroundColor: bg4,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: DesignSystem.borderM,
                 ),
               ),
             );

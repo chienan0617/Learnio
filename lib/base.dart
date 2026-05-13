@@ -50,6 +50,7 @@ export 'package:learnio/core/tutorial.dart';
 export 'package:learnio/core/utils.dart' hide width, height;
 export 'package:learnio/core/definition.dart' hide string;
 export 'package:learnio/core/widgets.dart';
+export 'package:learnio/core/design_system.dart';
 export 'package:learnio/core/exception.dart';
 
 

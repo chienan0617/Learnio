@@ -15,29 +15,26 @@ class ModelSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showModelPicker(context),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: DesignSystem.borderXL,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+            horizontal: DesignSystem.space12, vertical: DesignSystem.space8),
         decoration: BoxDecoration(
           color: bg2,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: DesignSystem.borderXL,
           border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.auto_awesome, size: 14, color: primary),
-            const SizedBox(width: 6),
+            const SizedBox(width: DesignSystem.space8),
             Text(
               chatController.selectedModel,
-              style: TextStyle(
-                color: tx2,
-                fontSize: 13,
-                fontWeight: fw5,
-              ),
+              style: tsBodyMedium.copyWith(fontWeight: fw6, color: tx1),
             ),
-            const SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: tx6),
+            const SizedBox(width: DesignSystem.space4),
+            Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: tx6),
           ],
         ),
       ),
@@ -49,10 +46,11 @@ class ModelSelector extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (ctx) => Container(
         decoration: BoxDecoration(
           color: bg1_5,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(DesignSystem.radiusXL)),
         ),
         child: SafeArea(
           child: Column(
@@ -60,7 +58,7 @@ class ModelSelector extends StatelessWidget {
             children: [
               // 拖動指示器
               Container(
-                margin: const EdgeInsets.only(top: 12),
+                margin: const EdgeInsets.only(top: DesignSystem.space12),
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
@@ -69,15 +67,8 @@ class ModelSelector extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  '選擇模型',
-                  style: TextStyle(
-                    color: tx1,
-                    fontSize: 18,
-                    fontWeight: fw7,
-                  ),
-                ),
+                padding: const EdgeInsets.all(DesignSystem.space24),
+                child: Text('選擇模型', style: tsTitleMedium),
               ),
               ...ChatController.availableModels.map((model) {
                 final isSelected = model == chatController.selectedModel;
@@ -88,9 +79,11 @@ class ModelSelector extends StatelessWidget {
                     onChanged();
                     Navigator.pop(ctx);
                   },
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: DesignSystem.space24, vertical: DesignSystem.space4),
                   leading: Container(
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       gradient: isSelected
                           ? LinearGradient(
@@ -99,30 +92,33 @@ class ModelSelector extends StatelessWidget {
                               end: Alignment.bottomRight,
                             )
                           : null,
-                      color: isSelected ? null : bg3,
-                      borderRadius: BorderRadius.circular(10),
+                      color: isSelected ? null : bg3.withOpacity(0.5),
+                      borderRadius: DesignSystem.borderM,
                     ),
                     child: Icon(
                       Icons.auto_awesome,
-                      size: 18,
+                      size: 20,
                       color: isSelected ? Colors.white : tx6,
                     ),
                   ),
                   title: Text(
                     model,
-                    style: TextStyle(
+                    style: tsBodyMedium.copyWith(
                       color: isSelected ? tx1 : tx2,
-                      fontSize: 15,
-                      fontWeight: isSelected ? fw6 : fw4,
+                      fontWeight: isSelected ? fw7 : fw4,
                     ),
                   ),
                   trailing: isSelected
-                      ? Icon(Icons.check_circle_rounded,
-                          color: primary, size: 20)
+                      ? Icon(
+                          Icons.check_circle_rounded,
+                          color: primary,
+                          size: 22,
+                        )
                       : null,
+                  shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
                 );
               }),
-              const SizedBox(height: 16),
+              const SizedBox(height: DesignSystem.space24),
             ],
           ),
         ),

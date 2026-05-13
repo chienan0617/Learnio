@@ -27,7 +27,7 @@ class _MessageBubbleState extends State<MessageBubble>
   void initState() {
     super.initState();
     _animController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: DesignSystem.animNormal,
       vsync: this,
     );
     _fadeAnimation = CurvedAnimation(
@@ -35,7 +35,7 @@ class _MessageBubbleState extends State<MessageBubble>
       curve: Curves.easeOut,
     );
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.15),
+      begin: const Offset(0, 0.05),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animController,
@@ -61,58 +61,33 @@ class _MessageBubbleState extends State<MessageBubble>
         position: _slideAnimation,
         child: Padding(
           padding: EdgeInsets.only(
-            left: isUser ? 48 : 16,
-            right: isUser ? 16 : 48,
-            top: 6,
-            bottom: 6,
+            left: isUser ? DesignSystem.space32 : DesignSystem.space12,
+            right: isUser ? DesignSystem.space12 : DesignSystem.space32,
+            top: DesignSystem.space8,
+            bottom: DesignSystem.space8,
           ),
           child: Column(
             crossAxisAlignment:
                 isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              // 角色標籤
+              // 角色標籤 與 頭像
               Padding(
-                padding: const EdgeInsets.only(bottom: 4, left: 4, right: 4),
+                padding: const EdgeInsets.only(
+                    bottom: DesignSystem.space8,
+                    left: DesignSystem.space4,
+                    right: DesignSystem.space4),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (!isUser) ...[
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [primary, secondary],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.auto_awesome,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Learnio',
-                        style: TextStyle(
-                          color: tx6,
-                          fontSize: 12,
-                          fontWeight: fw6,
-                        ),
-                      ),
+                      _buildAvatar(),
+                      const SizedBox(width: DesignSystem.space8),
+                      Text('Learnio', style: tsCaption.copyWith(fontWeight: fw7)),
                     ],
                     if (isUser) ...[
-                      Text(
-                        '你',
-                        style: TextStyle(
-                          color: tx6,
-                          fontSize: 12,
-                          fontWeight: fw6,
-                        ),
-                      ),
+                      Text('你', style: tsCaption.copyWith(fontWeight: fw7)),
+                      const SizedBox(width: DesignSystem.space8),
+                      _buildUserAvatar(),
                     ],
                   ],
                 ),
@@ -120,32 +95,33 @@ class _MessageBubbleState extends State<MessageBubble>
 
               // 訊息氣泡
               Container(
-                width: double.infinity,
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.85,
+                ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: DesignSystem.space16,
+                  vertical: DesignSystem.space12,
                 ),
                 decoration: BoxDecoration(
-                  color: isUser ? primary.withOpacity(0.15) : bg2,
-                  borderRadius: BorderRadius.circular(16).copyWith(
-                    topLeft: isUser ? null : const Radius.circular(4),
-                    topRight: isUser ? const Radius.circular(4) : null,
+                  color: isUser ? primary.withOpacity(0.08) : bg2,
+                  borderRadius: BorderRadius.only(
+                    topLeft: isUser ? DesignSystem.borderL.topLeft : Radius.zero,
+                    topRight: isUser ? Radius.zero : DesignSystem.borderL.topRight,
+                    bottomLeft: DesignSystem.borderL.bottomLeft,
+                    bottomRight: DesignSystem.borderL.bottomRight,
                   ),
                   border: Border.all(
                     color: isUser
-                        ? primary.withOpacity(0.2)
-                        : bg3.withOpacity(0.5),
+                        ? primary.withOpacity(0.15)
+                        : bg3.withOpacity(0.4),
                     width: 0.5,
                   ),
                 ),
                 child: SelectableText(
                   msg.content,
-                  style: TextStyle(
-                    color: tx1,
-                    fontSize: 14.5,
-                    fontWeight: fw4,
-                    height: 1.6,
-                    letterSpacing: 0.1,
+                  style: tsBodyLarge.copyWith(
+                    fontSize: 15,
+                    color: isUser ? tx1 : tx1.withOpacity(0.95),
                   ),
                 ),
               ),
@@ -153,7 +129,7 @@ class _MessageBubbleState extends State<MessageBubble>
               // 操作按鈕列 (僅 AI 訊息)
               if (!isUser)
                 Padding(
-                  padding: const EdgeInsets.only(top: 4, left: 4),
+                  padding: const EdgeInsets.only(top: DesignSystem.space4),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -167,7 +143,6 @@ class _MessageBubbleState extends State<MessageBubble>
                           widget.onFavoriteToggle?.call();
                         },
                       ),
-                      const SizedBox(width: 2),
                       _actionButton(
                         icon: Icons.library_add_outlined,
                         color: tx6,
@@ -176,7 +151,6 @@ class _MessageBubbleState extends State<MessageBubble>
                           widget.onSaveToLibrary?.call();
                         },
                       ),
-                      const SizedBox(width: 2),
                       _actionButton(
                         icon: Icons.content_copy_rounded,
                         color: tx6,
@@ -195,6 +169,35 @@ class _MessageBubbleState extends State<MessageBubble>
     );
   }
 
+  Widget _buildAvatar() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primary, secondary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: DesignSystem.borderS,
+      ),
+      child: const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
+    );
+  }
+
+  Widget _buildUserAvatar() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: bg2,
+        borderRadius: DesignSystem.borderS,
+        border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+      ),
+      child: Icon(Icons.person_rounded, size: 16, color: tx6),
+    );
+  }
+
   Widget _actionButton({
     required IconData icon,
     required Color color,
@@ -202,9 +205,9 @@ class _MessageBubbleState extends State<MessageBubble>
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: DesignSystem.borderS,
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(DesignSystem.space8),
         child: Icon(icon, size: 16, color: color),
       ),
     );
