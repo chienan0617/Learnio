@@ -1,5 +1,4 @@
 import 'package:learnio/base.dart';
-import 'package:learnio/script/controller/auth_controller.dart';
 import 'package:learnio/pages/auth/login_page.dart';
 
 class IntroPage extends StatefulWidget {

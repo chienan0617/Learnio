@@ -3,10 +3,10 @@ import 'package:http/http.dart' as http;
 
 /// Controller to manage API calls between the server and client.
 class ApiServiceController {
-  static const String _baseUrl = 'https://cas.cas617.workers.dev/learnio/chat';
+  static const String _baseUrl = 'http://127.0.0.1:8787/learnio/chat';
 
   /// Sends chat context to the server and returns a stream of responses.
-  /// 
+  ///
   /// [messages] is a list of maps containing 'role' and 'content'.
   /// [model] is the AI model to use.
   /// [images] is an optional list of base64 encoded images.
@@ -14,19 +14,29 @@ class ApiServiceController {
     required List<Map<String, dynamic>> messages,
     String? model,
     List<String>? images,
+    List<String>? files,
+    List<String>? links,
   }) async* {
+    final filteredMessages = messages.where((msg) {
+      final content = msg['content'];
+      return content != null && content.toString().trim().isNotEmpty;
+    }).toList();
+
+    logE(filteredMessages); // 確認過濾後的結果
+
     final client = http.Client();
-    
     try {
       final request = http.Request('POST', Uri.parse(_baseUrl));
       request.headers['Content-Type'] = 'application/json';
-      
+
       final body = {
-        'messages': messages,
+        'messages': filteredMessages, // 🛠️ 2. 改用過濾後的訊息
         if (model != null) 'model': model,
         if (images != null && images.isNotEmpty) 'images': images,
+        if (files != null && files.isNotEmpty) 'files': files,
+        if (links != null && links.isNotEmpty) 'links': links,
       };
-      
+
       request.body = jsonEncode(body);
 
       final response = await client.send(request);
@@ -37,42 +47,53 @@ class ApiServiceController {
       }
 
       // Read the stream
+      String buffer = '';
       await for (final chunk in response.stream.transform(utf8.decoder)) {
-        // Handle SSE (Server-Sent Events) or raw text
-        final lines = chunk.split('\n');
-        for (var line in lines) {
-          if (line.trim().isEmpty) continue;
-          
+        buffer += chunk;
+
+        // Process complete lines from the buffer
+        while (buffer.contains('\n')) {
+          final lineEnd = buffer.indexOf('\n');
+          final line = buffer.substring(0, lineEnd).trim();
+          buffer = buffer.substring(lineEnd + 1);
+
+          if (line.isEmpty) continue;
+
+          // 1. Handle SSE data prefix
+          String content = line;
           if (line.startsWith('data: ')) {
-            final data = line.substring(6).trim();
-            if (data == '[DONE]') break;
-            
-            try {
-              // Try to parse as JSON if it looks like JSON
-              if (data.startsWith('{')) {
-                final json = jsonDecode(data);
-                // Common formats: {"text": "..."}, {"content": "..."}, {"choices": [{"delta": {"content": "..."}}]}
-                if (json['text'] != null) {
-                  yield json['text'];
-                } else if (json['content'] != null) {
-                  yield json['content'];
-                } else if (json['choices'] != null && json['choices'] is List) {
-                  final choices = json['choices'] as List;
-                  if (choices.isNotEmpty && choices[0]['delta'] != null && choices[0]['delta']['content'] != null) {
-                    yield choices[0]['delta']['content'];
-                  }
+            content = line.substring(6).trim();
+          }
+
+          if (content == '[DONE]') return;
+
+          // 2. Try to parse as JSON (handles concatenated JSONs like {"text":"A"}{"text":"B"})
+          if (content.startsWith('{')) {
+            final jsonParts = content.split('}{');
+            for (var i = 0; i < jsonParts.length; i++) {
+              var part = jsonParts[i];
+              if (i > 0) part = '{$part';
+              if (i < jsonParts.length - 1) part = '$part}';
+
+              try {
+                final json = jsonDecode(part);
+                final text = _extractTextFromJson(json);
+                if (text != null) yield text;
+              } catch (e) {
+                // If it's not valid JSON despite starting with {, ignore it
+                // unless it's the last part which might be incomplete
+                if (i == jsonParts.length - 1 && !part.endsWith('}')) {
+                  // Put it back in buffer for next chunk
+                  buffer = part + (buffer.isEmpty ? "" : "\n" + buffer);
                 }
-              } else {
-                // If it's data: but not JSON, just yield the data
-                yield data;
               }
-            } catch (e) {
-              // If JSON parsing fails, just yield the raw data
-              yield data;
             }
           } else {
-            // Raw text chunk
-            yield line;
+            // 3. Raw text that doesn't look like JSON or SSE metadata
+            // We only yield it if it doesn't look like system noise
+            if (!_isSystemNoise(content)) {
+              yield content;
+            }
           }
         }
       }
@@ -81,5 +102,41 @@ class ApiServiceController {
     } finally {
       client.close();
     }
+  }
+
+  /// Extracts text from common AI response JSON formats.
+  String? _extractTextFromJson(Map<String, dynamic> json) {
+    if (json['text'] != null) return json['text'].toString();
+    if (json['content'] != null) return json['content'].toString();
+    if (json['choices'] != null && json['choices'] is List) {
+      final choices = json['choices'] as List;
+      if (choices.isNotEmpty) {
+        final choice = choices[0];
+        if (choice['delta'] != null && choice['delta']['content'] != null) {
+          return choice['delta']['content'].toString();
+        }
+        if (choice['message'] != null && choice['message']['content'] != null) {
+          return choice['message']['content'].toString();
+        }
+        if (choice['text'] != null) return choice['text'].toString();
+      }
+    }
+    return null;
+  }
+
+  /// Checks if a string looks like system diagnostic noise (e.g., from wrangler).
+  bool _isSystemNoise(String text) {
+    final noisePatterns = [
+      r'memory\s+/auth',
+      r'\d+\.\d+\s+MB',
+      r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', // Email
+      r'▀+', // Block characters
+    ];
+    for (final pattern in noisePatterns) {
+      if (RegExp(pattern, caseSensitive: false).hasMatch(text)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

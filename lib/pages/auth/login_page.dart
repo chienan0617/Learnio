@@ -1,5 +1,4 @@
 import 'package:learnio/base.dart';
-import 'package:learnio/script/controller/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

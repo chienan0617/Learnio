@@ -78,6 +78,13 @@ SingleChildScrollView scroll(Widget v, [ScrollPhysics? p]) =>
 Icon icon(IconData icon, [double size = 20, Color? color, FontWeight? fw]) =>
     Icon(icon, size: size, color: color ?? tx1, fontWeight: fw);
 
+Widget logo([double size = 20, Color? color]) => Image.asset(
+      'assets/icon/icon.webp',
+      width: size,
+      height: size,
+      color: color,
+    );
+
 IconButton iconButton(Icon icon, [fn, Color? color, double? size]) =>
     IconButton(onPressed: fn, icon: icon, color: color, iconSize: size);
 

@@ -14,9 +14,13 @@ class ChatController {
 
   Conversation? get current => _conversationController.current;
   List<ChatMessage> get messages => current?.messages ?? [];
+  bool get isIncognito => _conversationController.isIncognito;
 
   bool _isGenerating = false;
   bool get isGenerating => _isGenerating;
+
+  /// Returns true only when the AI is processing but hasn't started outputting text.
+  bool get isThinking => _isGenerating && (messages.isEmpty || messages.last.role != MessageRole.assistant || messages.last.content.isEmpty);
 
   String _selectedModel = 'Gemini 2.5 Pro';
   String get selectedModel => _selectedModel;
@@ -35,8 +39,8 @@ class ChatController {
     onStateChanged?.call();
   }
 
-  Future<void> sendMessage(String content, {List<String>? images}) async {
-    if (content.trim().isEmpty && (images == null || images.isEmpty)) return;
+  Future<void> sendMessage(String content, {List<String>? images, List<String>? files, List<String>? links}) async {
+    if (content.trim().isEmpty && (images == null || images.isEmpty) && (files == null || files.isEmpty) && (links == null || links.isEmpty)) return;
 
     // 如果沒有當前對話，建立新的
     if (current == null) {
@@ -52,6 +56,8 @@ class ChatController {
       content: content.trim(),
       timestamp: DateTime.now(),
       images: images,
+      files: files,
+      links: links,
     );
 
     current!.messages.add(userMsg);
@@ -68,7 +74,7 @@ class ChatController {
     onStateChanged?.call();
 
     // 呼叫真實 API 回應
-    await _fetchAiResponse(images: images);
+    await _fetchAiResponse(images: images, files: files, links: links);
   }
 
   Future<void> retryMessage(String messageId) async {
@@ -88,7 +94,7 @@ class ChatController {
     await _fetchAiResponse();
   }
 
-  Future<void> _fetchAiResponse({List<String>? images}) async {
+  Future<void> _fetchAiResponse({List<String>? images, List<String>? files, List<String>? links}) async {
     final aiMsgId = _generateId();
     final aiMsg = ChatMessage(
       id: aiMsgId,
@@ -101,7 +107,7 @@ class ChatController {
     current!.messages.add(aiMsg);
 
     try {
-      final stream = _chatApiService.getChatStream(current!, images: images);
+      final stream = _chatApiService.getChatStream(current!, images: images, files: files, links: links);
 
       String fullContent = '';
       bool hasReceivedData = false;

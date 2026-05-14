@@ -105,8 +105,9 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   Widget _buildAvatar() {
     return container(
-      icon(Icons.auto_awesome, 16, Colors.white),
-      width: 28,
+      logo(16, Colors.white),
+      width: 32,
+
       height: 28,
       gradient: LinearGradient(
         colors: [primary, secondary],

@@ -79,7 +79,7 @@ class _SideBarState extends State<SideBar> {
       row([
         // Logo
         container(
-          icon(Icons.auto_awesome_outlined, 24, Colors.white),
+          logo(24, Colors.white),
           width: 42,
           height: 42,
           gradient: LinearGradient(

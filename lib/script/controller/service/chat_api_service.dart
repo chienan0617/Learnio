@@ -8,7 +8,7 @@ class ChatApiService {
   final ApiServiceController _apiController = ApiServiceController();
 
   /// Streams the response for a given conversation.
-  Stream<String> getChatStream(Conversation conversation, {List<String>? images}) {
+  Stream<String> getChatStream(Conversation conversation, {List<String>? images, List<String>? files, List<String>? links}) {
     final messages = conversation.messages.map((m) => {
       'role': _mapRole(m.role),
       'content': m.content,
@@ -18,6 +18,8 @@ class ChatApiService {
       messages: messages,
       model: conversation.modelName,
       images: images,
+      files: files,
+      links: links,
     );
   }
 

@@ -68,5 +68,11 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSCameraUsageDescription</key>
+		<string>需要使用您的相機來拍攝照片</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>需要存取您的相簿以選擇照片</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>需要使用您的麥克風以錄製語音或影片</string>
 	</dict>
 </plist>

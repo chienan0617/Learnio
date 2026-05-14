@@ -1,4 +1,5 @@
 import 'package:learnio/base.dart';
+import 'package:learnio/pages/root/settings/theme_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -8,7 +9,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _isDarkMode = darkMode;
   bool _hapticEnabled = true;
   final String _language = '繁體中文';
 
@@ -23,14 +23,12 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
             children: [
                 _buildSection('外觀', [
-                  _toggleTile(
-                    iconData: Icons.dark_mode_rounded,
-                    title: '深色模式',
-                    value: _isDarkMode,
-                    onChanged: (v) {
-                      setState(() => _isDarkMode = v);
-                      darkMode = v;
-                      rebuild('main');
+                  _navTile(
+                    iconData: Icons.palette_outlined,
+                    title: '主題設定',
+                    subtitle: darkMode ? '深色模式' : '淺色模式',
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const ThemeSettingsPage()));
                     },
                   ),
                   _toggleTile(
@@ -50,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     onTap: () {},
                   ),
                   _navTile(
-                    iconData: Icons.auto_awesome,
+                    leading: logo(22, tx2),
                     title: '預設模型',
                     subtitle: 'Gemini 2.5 Pro',
                     onTap: () {},
@@ -120,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
         padding(
           const EdgeInsets.only(left: 4, bottom: DesignSystem.space12),
           text(
-            '外觀與介面',
+            title,
             14,
             fw7,
             tx6,
@@ -180,7 +178,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _navTile({
-    required IconData iconData,
+    IconData? iconData,
+    Widget? leading,
     required String title,
     String? subtitle,
     Color? titleColor,
@@ -188,7 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return ListTile(
       onTap: onTap,
-      leading: icon(iconData, 22, titleColor ?? tx2),
+      leading: leading ?? icon(iconData!, 22, titleColor ?? tx2),
       title: text(title, 14, fw6, titleColor ?? tx1),
       trailing: row(
         [

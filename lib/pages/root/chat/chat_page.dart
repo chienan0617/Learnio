@@ -59,9 +59,26 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return column([
-      // 頂部欄
-      _buildTopBar(context),
+    final isIncognito = _chat.isIncognito;
+    
+    return Scaffold(
+      backgroundColor: isIncognito ? hexColor('#12171b') : bg1,
+      body: column([
+        // 頂部欄
+        _buildTopBar(context),
+
+      // 無痕模式橫幅
+      if (isIncognito)
+        container(
+          row([
+            icon(Icons.privacy_tip_outlined, 14, Colors.white),
+            width(8),
+            text('已啟動無痕模式 - 訊息不會被儲存', 12, fw5, Colors.white),
+          ], ma: MainAxisAlignment.center),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          color: hexColor('#2d3436'),
+        ),
 
       // 訊息列表
       expand(
@@ -72,7 +89,7 @@ class _ChatPageState extends State<ChatPage> {
       ChatInputBar(
         chatController: _chat,
         conversationController: _conv,
-        onSend: (content, images) => _chat.sendMessage(content, images: images),
+        onSend: (content, images, files, links) => _chat.sendMessage(content, images: images, files: files, links: links),
         onVoicePressed: () {
           // TODO: 語音輸入
         },
@@ -83,15 +100,18 @@ class _ChatPageState extends State<ChatPage> {
           ).showSnackBar(SnackBar(content: text('已選擇 ${files.length} 個檔案')));
         },
       ),
-    ], ms: MainAxisSize.max);
+    ], ms: MainAxisSize.max),
+    );
   }
 
   Widget _buildTopBar(BuildContext context) {
+    final isIncognito = _chat.isIncognito;
+    
     return container(
       row([
         // 漢堡選單
         iconButton(
-          icon(Icons.menu_outlined, 26),
+          icon(Icons.menu_outlined, 26, isIncognito ? tx1 : null),
           () {
             HapticFeedback.lightImpact();
             Scaffold.of(context).openDrawer();
@@ -100,10 +120,10 @@ class _ChatPageState extends State<ChatPage> {
 
         expand(
           text(
-            _chat.current?.title ?? 'Learnio',
+            isIncognito ? '無痕對話' : (_chat.current?.title ?? 'Learnio'),
             18,
             fw6,
-            tx1,
+            isIncognito ? tx1 : tx1,
             false,
             null,
             fsN,
@@ -113,9 +133,23 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
 
-        // 新對話
+        // 無痕模式切換
         iconButton(
-          icon(Icons.add_comment_outlined, 24),
+          icon(
+            isIncognito ? Icons.privacy_tip : Icons.privacy_tip_outlined,
+            24,
+            isIncognito ? primary : tx6,
+          ),
+          () {
+            HapticFeedback.mediumImpact();
+            _conv.setIncognito(!isIncognito);
+            setState(() {});
+          },
+        ),
+
+        // 新對話 (非無痕模式才顯示，或在無痕模式下作為重置)
+        iconButton(
+          icon(Icons.add_comment_outlined, 24, isIncognito ? tx1 : null),
           () {
             HapticFeedback.lightImpact();
             _conv.startNewConversation();
@@ -129,9 +163,12 @@ class _ChatPageState extends State<ChatPage> {
         right: DesignSystem.space12,
         bottom: DesignSystem.space8,
       ),
-      color: bg1,
+      color: isIncognito ? bg2 : bg1,
       border: Border(
-        bottom: BorderSide(color: bg3.withOpacity(0.2), width: 0.5),
+        bottom: BorderSide(
+          color: isIncognito ? bg3 : bg3.withOpacity(0.2), 
+          width: 0.5,
+        ),
       ),
     );
   }
@@ -144,7 +181,7 @@ class _ChatPageState extends State<ChatPage> {
           [
             // AI Logo
             container(
-              icon(Icons.auto_awesome_outlined, 40, Colors.white),
+              logo(40, Colors.white),
               width: 80,
               height: 80,
               gradient: LinearGradient(
@@ -243,10 +280,10 @@ class _ChatPageState extends State<ChatPage> {
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(vertical: DesignSystem.space8),
-      itemCount: _chat.messages.length + (_chat.isGenerating ? 1 : 0),
+      itemCount: _chat.messages.length + (_chat.isThinking ? 1 : 0),
       itemBuilder: (context, index) {
-        // 最後一個是打字指示器
-        if (index == _chat.messages.length && _chat.isGenerating) {
+        // 最後一個是打字指示器 (僅在思考中顯示)
+        if (index == _chat.messages.length && _chat.isThinking) {
           return const TypingIndicator();
         }
 

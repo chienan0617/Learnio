@@ -1,6 +1,7 @@
 import 'package:learnio/base.dart';
 import 'package:learnio/script/types/chat_message.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MessageBubble extends StatefulWidget {
   final ChatMessage message;
@@ -100,6 +101,14 @@ class _MessageBubbleState extends State<MessageBubble>
                     _buildImageGrid(msg.images!),
                     height(DesignSystem.space8),
                   ],
+                  if (msg.files != null && msg.files!.isNotEmpty) ...[
+                    _buildFileList(msg.files!),
+                    height(DesignSystem.space8),
+                  ],
+                  if (msg.links != null && msg.links!.isNotEmpty) ...[
+                    _buildLinkList(msg.links!),
+                    height(DesignSystem.space8),
+                  ],
                   if (msg.isError)
                     _buildErrorContent()
                   else
@@ -188,8 +197,11 @@ class _MessageBubbleState extends State<MessageBubble>
 
   Widget _buildAvatar() {
     return container(
-      icon(widget.message.isError ? Icons.error_outline : Icons.auto_awesome, 16, Colors.white),
-      width: 28,
+      widget.message.isError
+          ? icon(Icons.error_outline, 16, Colors.white)
+          : logo(16, Colors.white),
+      width: 32,
+
       height: 28,
       gradient: LinearGradient(
         colors: widget.message.isError 
@@ -268,6 +280,52 @@ class _MessageBubbleState extends State<MessageBubble>
           height: 150,
           radius: DesignSystem.borderS,
           clip: Clip.antiAlias,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFileList(List<String> files) {
+    return column(
+      files.map((fileData) {
+        final parts = fileData.split(':');
+        final name = parts[0];
+        final ext = name.split('.').last.toUpperCase();
+
+        return container(
+          row([
+            icon(Icons.insert_drive_file_outlined, 20, primary),
+            width(DesignSystem.space12),
+            expand(text(name, 14, fw5, tx1, false, null, fsN, TextAlign.start, 1, TextOverflow.ellipsis)),
+            text(ext, 10, fw7, tx6),
+          ]),
+          padding: symmetric(DesignSystem.space12, DesignSystem.space8),
+          margin: const EdgeInsets.only(bottom: DesignSystem.space4),
+          color: bg3.withOpacity(0.3),
+          radius: DesignSystem.borderS,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildLinkList(List<String> links) {
+    return column(
+      links.map((link) {
+        return inkWell(
+          container(
+            row([
+              icon(Icons.link_outlined, 18, primary),
+              width(DesignSystem.space12),
+              expand(text(link, 14, fw5, primary, false, null, fsN, TextAlign.start, 1, TextOverflow.ellipsis)),
+              icon(Icons.open_in_new_rounded, 14, primary),
+            ]),
+            padding: symmetric(DesignSystem.space12, DesignSystem.space8),
+            margin: const EdgeInsets.only(bottom: DesignSystem.space4),
+            color: primary.withOpacity(0.05),
+            radius: DesignSystem.borderS,
+            border: Border.all(color: primary.withOpacity(0.2), width: 0.5),
+          ),
+          () => launchUrl(Uri.parse(link)),
         );
       }).toList(),
     );

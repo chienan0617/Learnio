@@ -6,12 +6,23 @@ class ConversationController {
   final List<Conversation> _conversations = [];
   Conversation? _current;
   void Function()? onStateChanged;
+  bool _isIncognito = false;
 
   List<Conversation> get conversations => List.unmodifiable(_conversations);
   Conversation? get current => _current;
+  bool get isIncognito => _isIncognito;
 
   ConversationController() {
     _loadFromStorage();
+  }
+
+  void setIncognito(bool value) {
+    if (_isIncognito == value) return;
+    _isIncognito = value;
+    
+    // Switch to a new session when entering/leaving incognito
+    _current = null;
+    onStateChanged?.call();
   }
 
   void _loadFromStorage() {
@@ -26,19 +37,27 @@ class ConversationController {
 
   Conversation createConversation({String title = '新對話'}) {
     final conv = Conversation(
-      id: 'conv_${DateTime.now().millisecondsSinceEpoch}',
-      title: title,
+      id: _isIncognito 
+          ? 'incognito_${DateTime.now().millisecondsSinceEpoch}'
+          : 'conv_${DateTime.now().millisecondsSinceEpoch}',
+      title: _isIncognito ? '無痕對話' : title,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    _conversations.insert(0, conv);
+    
+    if (!_isIncognito) {
+      _conversations.insert(0, conv);
+      DataController.saveConversation(conv);
+    }
+    
     _current = conv;
-    DataController.saveConversation(conv);
     onStateChanged?.call();
     return conv;
   }
 
   void renameConversation(String id, String newTitle) {
+    if (id.startsWith('incognito_')) return; // Incognito conversations can't be renamed/saved
+    
     final index = _conversations.indexWhere((c) => c.id == id);
     if (index != -1) {
       _conversations[index].title = newTitle;
@@ -48,7 +67,9 @@ class ConversationController {
 
   void updateConversation(Conversation conversation) {
     conversation.updatedAt = DateTime.now();
-    DataController.saveConversation(conversation);
+    if (!conversation.id.startsWith('incognito_')) {
+      DataController.saveConversation(conversation);
+    }
     onStateChanged?.call();
   }
 

@@ -70,7 +70,7 @@ class ModelSelector extends StatelessWidget {
                   vertical: DesignSystem.space4,
                 ),
                 leading: container(
-                  icon(Icons.auto_awesome, 20, isSelected ? Colors.white : tx6),
+                  logo(20, isSelected ? Colors.white : tx6),
                   width: 40,
                   height: 40,
                   gradient: isSelected

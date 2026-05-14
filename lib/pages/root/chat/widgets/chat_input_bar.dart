@@ -4,11 +4,18 @@ import 'package:learnio/script/controller/chat/conversation_controller.dart';
 import 'package:learnio/script/controller/chat/command_controller.dart';
 import 'package:learnio/pages/root/chat/widgets/model_selector.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatInputBar extends StatefulWidget {
   final ChatController chatController;
   final ConversationController conversationController;
-  final void Function(String content, List<String> images) onSend;
+  final void Function(
+    String content,
+    List<String> images,
+    List<String> files,
+    List<String> links,
+  )
+  onSend;
   final VoidCallback? onVoicePressed;
   final void Function(List<PlatformFile> files)? onFilesSelected;
   final String? hintText;
@@ -33,6 +40,8 @@ class _ChatInputBarState extends State<ChatInputBar> {
   bool _hasText = false;
   bool _showCommands = false;
   List<PlatformFile> _selectedFiles = [];
+  List<String> _selectedLinks = [];
+  final ImagePicker _picker = ImagePicker();
   final List<ChatCommand> _commands = CommandController.getCommands();
 
   @override
@@ -55,26 +64,47 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   Future<void> _handleSend() async {
     final text = _textController.text.trim();
-    if (text.isEmpty && _selectedFiles.isEmpty) return;
-    
+    if (text.isEmpty && _selectedFiles.isEmpty && _selectedLinks.isEmpty)
+      return;
+
     HapticFeedback.mediumImpact();
-    
-    // Convert files to base64 images
-    List<String> base64Images = [];
+
+    // Separate images from other files
+    List<String> images = [];
+    List<String> files = [];
+
     for (var file in _selectedFiles) {
+      final isImage = [
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+      ].contains(file.extension?.toLowerCase());
+
+      String base64Content = '';
       if (file.bytes != null) {
-        base64Images.add(base64Encode(file.bytes!));
-      } else if (file.path != null) {
+        base64Content = base64Encode(file.bytes!);
+      } else if (!kIsWeb && file.path != null) {
         final bytes = await File(file.path!).readAsBytes();
-        base64Images.add(base64Encode(bytes));
+        base64Content = base64Encode(bytes);
+      }
+
+      if (isImage) {
+        images.add(base64Content);
+      } else {
+        // For non-images, we might just send the name or metadata for now
+        // But the AI backend expects images. We'll send files separately.
+        files.add("${file.name}:$base64Content");
       }
     }
 
-    widget.onSend(text, base64Images);
-    
+    widget.onSend(text, images, files, _selectedLinks);
+
     _textController.clear();
     setState(() {
       _selectedFiles = [];
+      _selectedLinks = [];
       _showCommands = false;
     });
     _focusNode.requestFocus();
@@ -82,7 +112,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   Future<void> _pickFiles() async {
     final result = await FilePicker.pickFiles(
-      type: FileType.image,
+      type: FileType.any,
       allowMultiple: true,
       withData: true,
     );
@@ -95,6 +125,111 @@ class _ChatInputBarState extends State<ChatInputBar> {
     }
   }
 
+  Future<void> _takePhoto() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
+      final bytes = await photo.readAsBytes();
+      setState(() {
+        _selectedFiles.add(
+          PlatformFile(
+            name: photo.name,
+            size: bytes.length,
+            bytes: bytes,
+            path: kIsWeb ? null : photo.path,
+          ),
+        );
+      });
+    }
+  }
+
+  void _showAttachmentMenu() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => container(
+        column([
+          padding(symmetricAll(DesignSystem.space16), text('新增附件', 18, fw7)),
+          _attachmentOption(Icons.camera_alt_outlined, '拍攝照片', _takePhoto),
+          _attachmentOption(Icons.image_outlined, '從相簿選擇', () async {
+            final result = await FilePicker.pickFiles(
+              type: FileType.image,
+              allowMultiple: true,
+              withData: true,
+            );
+            if (result != null)
+              setState(() => _selectedFiles.addAll(result.files));
+          }),
+          _attachmentOption(
+            Icons.insert_drive_file_outlined,
+            '傳送檔案',
+            _pickFiles,
+          ),
+          _attachmentOption(Icons.link_outlined, '添加連結', _addLinkDialog),
+          height(DesignSystem.space24),
+        ]),
+        color: bg1,
+        radius: const BorderRadius.vertical(
+          top: Radius.circular(DesignSystem.radiusXL),
+        ),
+      ),
+    );
+  }
+
+  Widget _attachmentOption(
+    IconData iconData,
+    String label,
+    VoidCallback onTap,
+  ) {
+    return inkWell(
+      padding(
+        symmetric(DesignSystem.space20, DesignSystem.space16),
+        row([
+          icon(iconData, 24, tx6),
+          width(DesignSystem.space16),
+          text(label, 16, fw5, tx1),
+        ]),
+      ),
+      () {
+        popPage(context);
+        onTap();
+      },
+    );
+  }
+
+  void _addLinkDialog() {
+    final linkController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: bg2,
+        title: text('添加連結', 18, fw7),
+        content: TextField(
+          controller: linkController,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: '輸入網址 (http://...)',
+            hintStyle: tsBodyMedium.copyWith(color: tx6),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => popPage(context),
+            child: text('取消', 14, fw5, tx6),
+          ),
+          TextButton(
+            onPressed: () {
+              if (linkController.text.isNotEmpty) {
+                setState(() => _selectedLinks.add(linkController.text.trim()));
+                popPage(context);
+              }
+            },
+            child: text('添加', 14, fw7, primary),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return container(
@@ -104,8 +239,27 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
         container(
           column([
-            if (_selectedFiles.isNotEmpty) ...[
-              _buildFilePreview(),
+            if (_selectedFiles.isNotEmpty || _selectedLinks.isNotEmpty) ...[
+              padding(
+                symmetricH(DesignSystem.space12),
+                column([
+                  if (_selectedFiles.isNotEmpty)
+                    scroll(
+                      row(
+                        _selectedFiles.map((file) => _buildFilePreview(file)).toList(),
+                        ma: MainAxisAlignment.start,
+                      ),
+                      const BouncingScrollPhysics(),
+                    ),
+                  if (_selectedLinks.isNotEmpty)
+                    padding(
+                      const EdgeInsets.only(top: DesignSystem.space8),
+                      column(
+                        _selectedLinks.map((link) => _buildLinkPreview(link)).toList(),
+                      ),
+                    ),
+                ]),
+              ),
               Divider(color: bg3.withOpacity(0.3), height: 1),
             ],
 
@@ -145,12 +299,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
               symmetric(DesignSystem.space12, DesignSystem.space8),
               row([
                 // 附件按鈕
-                iconButton(icon(Icons.add_circle_outline, 22, tx6), _pickFiles),
+                iconButton(
+                  icon(Icons.add_circle_outline, 24, tx6),
+                  _showAttachmentMenu,
+                ),
                 width(DesignSystem.space4),
-                
+
                 // 指令按鈕
                 iconButton(
-                  icon(Icons.terminal_outlined, 22, _showCommands ? primary : tx6),
+                  icon(
+                    Icons.terminal_outlined,
+                    22,
+                    _showCommands ? primary : tx6,
+                  ),
                   () => setState(() => _showCommands = !_showCommands),
                 ),
                 width(DesignSystem.space4),
@@ -160,7 +321,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   chatController: widget.chatController,
                   onChanged: () => setState(() {}),
                 ),
-                
+
                 const Spacer(),
 
                 // 語音按鈕 / 送出按鈕
@@ -169,7 +330,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   transitionBuilder: (child, anim) {
                     return ScaleTransition(scale: anim, child: child);
                   },
-                  child: (_hasText || _selectedFiles.isNotEmpty) ? _buildSendButton() : _buildVoiceButton(),
+                  child: (_hasText || _selectedFiles.isNotEmpty)
+                      ? _buildSendButton()
+                      : _buildVoiceButton(),
                 ),
               ]),
             ),
@@ -202,69 +365,134 @@ class _ChatInputBarState extends State<ChatInputBar> {
         boxShadow: DesignSystem.shadowSoft,
       ),
       child: column(
-
-        _commands.map((cmd) => inkWell(
-          container(
-            row([
-              icon(cmd.icon, 20, tx6),
-              width(DesignSystem.space12),
-              column([
-                text(cmd.name, 15, fw6, tx1),
-                text(cmd.description, 12, fw4, tx6),
-              ], ca: CrossAxisAlignment.start),
-            ]),
-            padding: symmetric(DesignSystem.space12, DesignSystem.space8),
-          ),
-          () async {
-            setState(() => _showCommands = false);
-            await cmd.execute(context, widget.chatController, widget.conversationController);
-          },
-        )).toList(),
+        _commands
+            .map(
+              (cmd) => inkWell(
+                container(
+                  row([
+                    icon(cmd.icon, 20, tx6),
+                    width(DesignSystem.space12),
+                    column([
+                      text(cmd.name, 15, fw6, tx1),
+                      text(cmd.description, 12, fw4, tx6),
+                    ], ca: CrossAxisAlignment.start),
+                  ]),
+                  padding: symmetric(DesignSystem.space12, DesignSystem.space8),
+                ),
+                () async {
+                  setState(() => _showCommands = false);
+                  await cmd.execute(
+                    context,
+                    widget.chatController,
+                    widget.conversationController,
+                  );
+                },
+              ),
+            )
+            .toList(),
       ),
     );
   }
 
-  Widget _buildFilePreview() {
-    return Container(
-      height: 80,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: symmetric(DesignSystem.space12, DesignSystem.space8),
-        itemCount: _selectedFiles.length,
-        itemBuilder: (context, index) {
-          final file = _selectedFiles[index];
-          return padding(
-            const EdgeInsets.only(right: DesignSystem.space8),
-            Stack(
-              children: [
-                container(
-                  file.bytes != null 
-                    ? Image.memory(file.bytes!, fit: BoxFit.cover)
-                    : (file.path != null ? Image.file(File(file.path!), fit: BoxFit.cover) : icon(Icons.insert_drive_file)),
-                  width: 60,
-                  height: 60,
-                  radius: DesignSystem.borderS,
-                  clip: Clip.antiAlias,
-                ),
-                positioned(
-                  inkWell(
-                    container(
-                      icon(Icons.close, 12, Colors.white),
-                      width: 20,
-                      height: 20,
-                      color: Colors.black54,
-                      radius: BorderRadius.circular(10),
-                    ),
-                    () => setState(() => _selectedFiles.removeAt(index)),
+  Widget _buildFilePreview(PlatformFile file) {
+    final isImage = [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+    ].contains(file.extension?.toLowerCase());
+
+    return container(
+      stack([
+        if (isImage)
+          ClipRRect(
+            borderRadius: DesignSystem.borderM,
+            child: kIsWeb
+                ? Image.memory(
+                    file.bytes!,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  )
+                : Image.file(
+                    File(file.path!),
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
                   ),
-                  t: -5,
-                  r: -5,
+          )
+        else
+          container(
+            center(
+              column([
+                icon(Icons.insert_drive_file, 24, tx6),
+                height(4),
+                text(
+                  file.extension?.toUpperCase() ?? 'FILE',
+                  10,
+                  fw7,
+                  tx6,
+                  false,
+                  null,
+                  fsN,
+                  TextAlign.center,
+                  1,
+                  TextOverflow.ellipsis,
                 ),
-              ],
+              ]),
             ),
-          );
-        },
-      ),
+            width: 60,
+            height: 60,
+            color: bg3,
+            radius: DesignSystem.borderM,
+          ),
+        positioned(
+          inkWell(
+            container(
+              icon(Icons.close, 12, Colors.white),
+              color: Colors.black54,
+              shape: BoxShape.circle,
+              padding: symmetricAll(2),
+            ),
+            () => setState(() => _selectedFiles.remove(file)),
+          ),
+          r: -2,
+          t: -2,
+        ),
+      ]),
+      margin: const EdgeInsets.only(right: DesignSystem.space8),
+    );
+  }
+
+  Widget _buildLinkPreview(String link) {
+    return container(
+      row([
+        icon(Icons.link, 16, tx6),
+        width(8),
+        expand(
+          text(
+            link,
+            14,
+            fw5,
+            tx1,
+            false,
+            null,
+            fsN,
+            TextAlign.start,
+            1,
+            TextOverflow.ellipsis,
+          ),
+        ),
+        inkWell(
+          icon(Icons.close, 16, tx6),
+          () => setState(() => _selectedLinks.remove(link)),
+        ),
+      ]),
+      padding: symmetric(DesignSystem.space12, DesignSystem.space8),
+      margin: const EdgeInsets.only(bottom: DesignSystem.space4),
+      color: bg3,
+      radius: DesignSystem.borderM,
     );
   }
 

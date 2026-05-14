@@ -85,3 +85,5 @@ TextStyle get tsCaption => TextStyle(
       fontWeight: fw5,
       color: tx6,
     );
+
+    // borderXL_V
