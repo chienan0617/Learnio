@@ -43,14 +43,12 @@ class _ErrorPageState extends State<ErrorPage> {
             box(0, 48),
             // Threads 風格的寬按鈕
             inkWell(
-              Container(
+              container(
+                center(text("重試", 16, fw8, tx1p)), // 黑字
                 width: double.infinity,
                 padding: symmetricV(16),
-                decoration: BoxDecoration(
-                  color: tx1, // 純白背景
-                  borderRadius: borderCircular(12),
-                ),
-                child: center(text("重試", 16, fw8, tx1p)), // 黑字
+                color: tx1, // 純白背景
+                radius: borderCircular(12),
               ),
               () => popPage(context),
             ),
@@ -114,14 +112,8 @@ class ErrorSymbolize extends StatelessWidget {
                   box(0, 32),
                   // Threads 風格按鈕：高對比黑白翻轉
                   inkWell(
-                    Container(
-                      width: double.infinity,
-                      padding: symmetricV(14),
-                      decoration: BoxDecoration(
-                        color: tx1, // 白色
-                        borderRadius: borderCircular(12),
-                      ),
-                      child: center(
+                    container(
+                      center(
                         text(
                           buttonDescription.toUpperCase(),
                           16,
@@ -129,6 +121,10 @@ class ErrorSymbolize extends StatelessWidget {
                           tx1p,
                         ), // 黑色文字
                       ),
+                      width: double.infinity,
+                      padding: symmetricV(14),
+                      color: tx1, // 白色
+                      radius: borderCircular(12),
                     ),
                     onButtonPressed ?? () => Navigator.pop(context),
                   ),

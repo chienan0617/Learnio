@@ -16,16 +16,15 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bg1,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
-              children: [
+      body: column([
+        _buildHeader(context),
+        expand(
+          ListView(
+            padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space20),
+            children: [
                 _buildSection('外觀', [
                   _toggleTile(
-                    icon: Icons.dark_mode_rounded,
+                    iconData: Icons.dark_mode_rounded,
                     title: '深色模式',
                     value: _isDarkMode,
                     onChanged: (v) {
@@ -35,7 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   ),
                   _toggleTile(
-                    icon: Icons.vibration_rounded,
+                    iconData: Icons.vibration_rounded,
                     title: '觸覺反饋',
                     value: _hapticEnabled,
                     onChanged: (v) => setState(() => _hapticEnabled = v),
@@ -45,13 +44,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: DesignSystem.space24),
                 _buildSection('一般', [
                   _navTile(
-                    icon: Icons.language_rounded,
+                    iconData: Icons.language_rounded,
                     title: '語言',
                     subtitle: _language,
                     onTap: () {},
                   ),
                   _navTile(
-                    icon: Icons.auto_awesome,
+                    iconData: Icons.auto_awesome,
                     title: '預設模型',
                     subtitle: 'Gemini 2.5 Pro',
                     onTap: () {},
@@ -61,119 +60,127 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: DesignSystem.space24),
                 _buildSection('資料', [
                   _navTile(
-                    icon: Icons.download_rounded,
+                    iconData: Icons.download_rounded,
                     title: '匯出對話記錄',
                     onTap: () {},
                   ),
                   _navTile(
-                    icon: Icons.delete_outline_rounded,
+                    iconData: Icons.delete_outline_rounded,
                     title: '清除所有資料',
                     titleColor: CommonColors.error,
                     onTap: () {},
                   ),
                 ]),
 
-                const SizedBox(height: DesignSystem.space24),
                 _buildSection('關於', [
                   _navTile(
-                    icon: Icons.info_outline_rounded,
+                    iconData: Icons.info_outline_rounded,
                     title: '版本',
                     subtitle: System.version,
                     onTap: () {},
                   ),
                   _navTile(
-                    icon: Icons.code_rounded,
+                    iconData: Icons.code_rounded,
                     title: '開發者',
                     subtitle: 'PCET_CHIENAN0617',
                     onTap: () {},
                   ),
                 ]),
 
-                const SizedBox(height: 48),
+                height(48),
               ],
             ),
           ),
-        ],
-      ),
+        ]),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
+    return container(
+      row([
+        iconButton(
+          icon(Icons.menu_outlined, 26, tx1),
+          () => Scaffold.of(context).openDrawer(),
+        ),
+        width(DesignSystem.space8),
+        text('設定', 24, fw7),
+      ]),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + DesignSystem.space12,
         left: DesignSystem.space12,
         right: DesignSystem.space20,
         bottom: DesignSystem.space16,
       ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: Icon(Icons.menu_outlined, color: tx1, size: 26),
-          ),
-          const SizedBox(width: DesignSystem.space8),
-          Text('設定', style: tsTitleLarge.copyWith(fontSize: 24)),
-        ],
-      ),
     );
   }
 
   Widget _buildSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: DesignSystem.space12),
-          child: Text(
-            title,
-            style: tsCaption.copyWith(fontWeight: fw7, letterSpacing: 1.0, color: tx6),
+    return column(
+      [
+        padding(
+          const EdgeInsets.only(left: 4, bottom: DesignSystem.space12),
+          text(
+            '外觀與介面',
+            14,
+            fw7,
+            tx6,
+            false,
+            null,
+            fsN,
+            TextAlign.start,
+            null,
+            TextOverflow.clip,
+            1.2,
           ),
         ),
-        Container(
-          decoration: BoxDecoration(
-            color: bg2,
-            borderRadius: DesignSystem.borderM,
-            border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
-            boxShadow: DesignSystem.shadowSoft,
-          ),
-          child: Column(
-            children: List.generate(children.length, (index) {
-              return Column(
-                children: [
+        container(
+          column(
+            List.generate(children.length, (index) {
+              return column(
+                [
                   children[index],
                   if (index < children.length - 1)
-                    Divider(height: 1, thickness: 0.5, color: bg3.withOpacity(0.3), indent: 56),
+                    Divider(
+                        height: 1,
+                        thickness: 0.5,
+                        color: bg3.withOpacity(0.3),
+                        indent: 56),
                 ],
               );
             }),
           ),
+          color: bg2,
+          radius: DesignSystem.borderM,
+          border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
+          shadow: DesignSystem.shadowSoft,
         ),
       ],
+      ca: CrossAxisAlignment.start,
     );
   }
 
   Widget _toggleTile({
-    required IconData icon,
+    required IconData iconData,
     required String title,
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
     return ListTile(
-      leading: Icon(icon, color: tx2, size: 22),
-      title: Text(title, style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6)),
+      leading: icon(iconData, 22, tx2),
+      title: text(title, 14, fw6, tx1),
       trailing: Switch.adaptive(
         value: value,
         onChanged: onChanged,
         activeColor: primary,
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: DesignSystem.space16, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space16, vertical: 2),
       shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
     );
   }
 
   Widget _navTile({
-    required IconData icon,
+    required IconData iconData,
     required String title,
     String? subtitle,
     Color? titleColor,
@@ -181,19 +188,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return ListTile(
       onTap: onTap,
-      leading: Icon(icon, color: titleColor ?? tx2, size: 22),
-      title: Text(title,
-          style: tsBodyMedium.copyWith(color: titleColor ?? tx1, fontWeight: fw6)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (subtitle != null)
-            Text(subtitle, style: tsCaption.copyWith(color: tx6)),
-          const SizedBox(width: DesignSystem.space8),
-          Icon(Icons.chevron_right_rounded, color: tx6, size: 20),
+      leading: icon(iconData, 22, titleColor ?? tx2),
+      title: text(title, 14, fw6, titleColor ?? tx1),
+      trailing: row(
+        [
+          if (subtitle != null) text(subtitle, 12, fw4, tx6),
+          width(DesignSystem.space8),
+          icon(Icons.chevron_right_rounded, 20, tx6),
         ],
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: DesignSystem.space16, vertical: 2),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: DesignSystem.space16, vertical: 2),
       shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
     );
   }

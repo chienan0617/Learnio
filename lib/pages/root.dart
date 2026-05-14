@@ -1,6 +1,7 @@
 import 'package:learnio/base.dart';
 import 'package:learnio/pages/root/root.dart';
-import 'package:learnio/pages/tutorial/tutorial.dart';
+import 'package:learnio/pages/auth/intro_page.dart';
+import 'package:learnio/pages/auth/login_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -14,13 +15,28 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     Rebuild.register('main', () => setState(() {}));
+    AuthController.instance.checkAuth();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 檢查是否已看過導覽
-    final bool isTutored = Data.app.get<bool>("tutored", false);
+    final auth = AuthController.instance;
 
+    // 1. 如果已登入，進入主頁面
+    if (auth.isLoggedIn) {
+      return _buildApp(const RootPage());
+    }
+
+    // 2. 如果未看過導覽，進入導覽頁面
+    if (!auth.hasFinishedIntro()) {
+      return _buildApp(const IntroPage());
+    }
+
+    // 3. 否則進入登入頁面
+    return _buildApp(const LoginPage());
+  }
+
+  Widget _buildApp(Widget home) {
     return MaterialApp(
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
         overscroll: false,
@@ -29,8 +45,9 @@ class _MainPageState extends State<MainPage> {
       theme: ThemeData(
         brightness: darkMode ? Brightness.dark : Brightness.light,
         primaryColor: primary,
+        fontFamily: faSg,
       ),
-      home: isTutored ? const RootPage() : const TutorialIntroductionPage(),
+      home: home,
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context)

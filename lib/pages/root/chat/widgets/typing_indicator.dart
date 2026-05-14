@@ -47,86 +47,73 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
+    return padding(
+      const EdgeInsets.only(
         left: DesignSystem.space12,
         right: DesignSystem.space32,
         top: DesignSystem.space8,
         bottom: DesignSystem.space8,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // AI 標籤
-          Padding(
-            padding: const EdgeInsets.only(
-                bottom: DesignSystem.space8, left: DesignSystem.space4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildAvatar(),
-                const SizedBox(width: DesignSystem.space8),
-                Text(
-                  'Learnio',
-                  style: tsCaption.copyWith(fontWeight: fw7),
-                ),
-              ],
+      column([
+        // AI 標籤
+        padding(
+          const EdgeInsets.only(
+              bottom: DesignSystem.space8, left: DesignSystem.space4),
+          row([
+            _buildAvatar(),
+            width(DesignSystem.space8),
+            text(
+              'Learnio',
+              12,
+              fw7,
             ),
-          ),
+          ]),
+        ),
 
-          // 打字指示器氣泡
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: DesignSystem.space20, vertical: DesignSystem.space16),
-            decoration: BoxDecoration(
-              color: bg2,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.zero,
-                topRight: DesignSystem.borderL.topRight,
-                bottomLeft: DesignSystem.borderL.bottomLeft,
-                bottomRight: DesignSystem.borderL.bottomRight,
+        // 打字指示器氣泡
+        container(
+          row(List.generate(3, (i) {
+            return AnimatedBuilder(
+              animation: _animations[i],
+              builder: (_, __) => Transform.translate(
+                offset: Offset(0, _animations[i].value),
+                child: container(
+                  const SizedBox.shrink(),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: 6,
+                  height: 6,
+                  color: primary.withOpacity(0.4 + i * 0.2),
+                  shape: BoxShape.circle,
+                ),
               ),
-              border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(3, (i) {
-                return AnimatedBuilder(
-                  animation: _animations[i],
-                  builder: (_, __) => Transform.translate(
-                    offset: Offset(0, _animations[i].value),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: primary.withOpacity(0.4 + i * 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
+            );
+          })),
+          padding: const EdgeInsets.symmetric(
+              horizontal: DesignSystem.space20, vertical: DesignSystem.space16),
+          color: bg2,
+          radius: BorderRadius.only(
+            topLeft: Radius.zero,
+            topRight: DesignSystem.borderL.topRight,
+            bottomLeft: DesignSystem.borderL.bottomLeft,
+            bottomRight: DesignSystem.borderL.bottomRight,
           ),
-        ],
-      ),
+          border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
+        ),
+      ]),
     );
   }
 
   Widget _buildAvatar() {
-    return Container(
+    return container(
+      icon(Icons.auto_awesome, 16, Colors.white),
       width: 28,
       height: 28,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primary, secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: DesignSystem.borderS,
+      gradient: LinearGradient(
+        colors: [primary, secondary],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ),
-      child: const Icon(Icons.auto_awesome, size: 16, color: Colors.white),
+      radius: DesignSystem.borderS,
     );
   }
 }

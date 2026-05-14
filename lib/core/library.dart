@@ -44,12 +44,12 @@ Text textDeprecated(
   maxLines: ml,
 );
 
-FittedBox getErrorBox(String text, {color = Colors.red}) => FittedBox(
-  child: Container(
-    color: color,
-    child: Text(text, style: TextStyle(color: Colors.white)),
-  ),
-);
+FittedBox getErrorBox(String txt, {color = Colors.red}) => FittedBox(
+      child: container(
+        text(txt, 14, fw4, Colors.white),
+        color: color,
+      ),
+    );
 IconThemeData getIconThemeData(double size, [Color? color, op = true]) =>
     IconThemeData(size: size, color: color ?? style());
 
@@ -187,18 +187,18 @@ ListTile getListTile(
   Function trailingFunc = none,
 }) {
   return ListTile(
-    leading: Icon(leading, color: style(), size: leadingSize),
-    title: Text(
+    leading: icon(leading, leadingSize, style()),
+    title: text(
       title,
-      style: TextStyle(color: style(), fontSize: titleSize),
+      titleSize,
+      fw4,
+      style(),
     ),
     trailing: (trailing == Icons.abc)
-        ? Container()
-        : IconButton(
-            onPressed: () {
-              trailingFunc();
-            },
-            icon: Icon(trailing, color: style(), size: trailingSize),
+        ? box(0, 0)
+        : iconButton(
+            icon(trailing, trailingSize, style()),
+            () => trailingFunc(),
           ),
   );
 }

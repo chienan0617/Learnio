@@ -33,6 +33,12 @@ class ChatMessage {
   @HiveField(5)
   bool isFavorite;
 
+  @HiveField(6)
+  final List<String>? images;
+
+  @HiveField(7)
+  bool isError;
+
   ChatMessage({
     required this.id,
     required this.conversationId,
@@ -40,6 +46,8 @@ class ChatMessage {
     required this.content,
     required this.timestamp,
     this.isFavorite = false,
+    this.images,
+    this.isError = false,
   });
 
   ChatMessage copyWith({
@@ -49,6 +57,8 @@ class ChatMessage {
     String? content,
     DateTime? timestamp,
     bool? isFavorite,
+    List<String>? images,
+    bool? isError,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -57,6 +67,8 @@ class ChatMessage {
       content: content ?? this.content,
       timestamp: timestamp ?? this.timestamp,
       isFavorite: isFavorite ?? this.isFavorite,
+      images: images ?? this.images,
+      isError: isError ?? this.isError,
     );
   }
 

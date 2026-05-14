@@ -71,7 +71,8 @@ class _ChatPageState extends State<ChatPage> {
       // 輸入區
       ChatInputBar(
         chatController: _chat,
-        onSend: (content) => _chat.sendMessage(content),
+        conversationController: _conv,
+        onSend: (content, images) => _chat.sendMessage(content, images: images),
         onVoicePressed: () {
           // TODO: 語音輸入
         },
@@ -86,20 +87,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildTopBar(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + DesignSystem.space8,
-        left: DesignSystem.space12,
-        right: DesignSystem.space12,
-        bottom: DesignSystem.space8,
-      ),
-      decoration: BoxDecoration(
-        color: bg1,
-        border: Border(
-          bottom: BorderSide(color: bg3.withOpacity(0.2), width: 0.5),
-        ),
-      ),
-      child: row([
+    return container(
+      row([
         // 漢堡選單
         iconButton(
           icon(Icons.menu_outlined, 26),
@@ -134,6 +123,16 @@ class _ChatPageState extends State<ChatPage> {
           },
         ),
       ]),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + DesignSystem.space8,
+        left: DesignSystem.space12,
+        right: DesignSystem.space12,
+        bottom: DesignSystem.space8,
+      ),
+      color: bg1,
+      border: Border(
+        bottom: BorderSide(color: bg3.withOpacity(0.2), width: 0.5),
+      ),
     );
   }
 
@@ -144,25 +143,23 @@ class _ChatPageState extends State<ChatPage> {
         column(
           [
             // AI Logo
-            Container(
+            container(
+              icon(Icons.auto_awesome_outlined, 40, Colors.white),
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [primary, secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: DesignSystem.borderXL,
-                boxShadow: [
-                  BoxShadow(
-                    color: primary.withOpacity(0.25),
-                    blurRadius: 30,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+              gradient: LinearGradient(
+                colors: [primary, secondary],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              child: icon(Icons.auto_awesome_outlined, 40, Colors.white),
+              radius: DesignSystem.borderXL,
+              shadow: [
+                BoxShadow(
+                  color: primary.withOpacity(0.25),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
             height(DesignSystem.space32),
             text(
@@ -259,6 +256,9 @@ class _ChatPageState extends State<ChatPage> {
           message: msg,
           onFavoriteToggle: () {
             _chat.toggleFavorite(msg.id);
+          },
+          onRetry: () {
+            _chat.retryMessage(msg.id);
           },
           onSaveToLibrary: () {
             widget.learningController.addItem(

@@ -6,12 +6,14 @@ class MessageBubble extends StatefulWidget {
   final ChatMessage message;
   final VoidCallback? onFavoriteToggle;
   final VoidCallback? onSaveToLibrary;
+  final VoidCallback? onRetry;
 
   const MessageBubble({
     super.key,
     required this.message,
     this.onFavoriteToggle,
     this.onSaveToLibrary,
+    this.onRetry,
   });
 
   @override
@@ -93,31 +95,42 @@ class _MessageBubbleState extends State<MessageBubble>
 
               // 訊息氣泡
               container(
-                MarkdownBody(
-                  data: msg.content,
-                  selectable: true,
-                  styleSheet: MarkdownStyleSheet(
-                    p: tsBodyLarge.copyWith(
-                      fontSize: 17,
-                      color: isUser ? tx1 : tx1.withOpacity(0.95),
+                column([
+                  if (msg.images != null && msg.images!.isNotEmpty) ...[
+                    _buildImageGrid(msg.images!),
+                    height(DesignSystem.space8),
+                  ],
+                  if (msg.isError)
+                    _buildErrorContent()
+                  else
+                    MarkdownBody(
+                      data: msg.content,
+                      selectable: true,
+                      styleSheet: MarkdownStyleSheet(
+                        p: tsBodyLarge.copyWith(
+                          fontSize: 17,
+                          color: isUser ? tx1 : tx1.withOpacity(0.95),
+                        ),
+                        h1: tsTitleLarge.copyWith(fontSize: 24),
+                        h2: tsTitleLarge.copyWith(fontSize: 22),
+                        h3: tsTitleLarge.copyWith(fontSize: 20),
+                        listBullet: tsBodyLarge.copyWith(fontSize: 17, color: primary),
+                        code: tsBodyMedium.copyWith(
+                          backgroundColor: bg3.withOpacity(0.3),
+                          fontFamily: 'monospace',
+                        ),
+                        codeblockDecoration: BoxDecoration(
+                          color: bg3.withOpacity(0.2),
+                          borderRadius: DesignSystem.borderS,
+                        ),
+                      ),
                     ),
-                    h1: tsTitleLarge.copyWith(fontSize: 24),
-                    h2: tsTitleLarge.copyWith(fontSize: 22),
-                    h3: tsTitleLarge.copyWith(fontSize: 20),
-                    listBullet: tsBodyLarge.copyWith(fontSize: 17, color: primary),
-                    code: tsBodyMedium.copyWith(
-                      backgroundColor: bg3.withOpacity(0.3),
-                      fontFamily: 'monospace',
-                    ),
-                    codeblockDecoration: BoxDecoration(
-                      color: bg3.withOpacity(0.2),
-                      borderRadius: DesignSystem.borderS,
-                    ),
-                  ),
-                ),
+                ]),
                 width: MediaQuery.of(context).size.width * 0.85,
                 padding: symmetric(DesignSystem.space16, DesignSystem.space12),
-                color: isUser ? primary.withOpacity(0.08) : bg2,
+                color: msg.isError 
+                    ? Colors.red.withOpacity(0.05) 
+                    : (isUser ? primary.withOpacity(0.08) : bg2),
                 radius: BorderRadius.only(
                   topLeft: isUser ? DesignSystem.borderL.topLeft : Radius.zero,
                   topRight: isUser ? Radius.zero : DesignSystem.borderL.topRight,
@@ -125,13 +138,15 @@ class _MessageBubbleState extends State<MessageBubble>
                   bottomRight: DesignSystem.borderL.bottomRight,
                 ),
                 border: Border.all(
-                  color: isUser ? primary.withOpacity(0.15) : bg3.withOpacity(0.4),
+                  color: msg.isError 
+                      ? Colors.red.withOpacity(0.3) 
+                      : (isUser ? primary.withOpacity(0.15) : bg3.withOpacity(0.4)),
                   width: 0.5,
                 ),
               ),
 
-              // 操作按鈕列 (僅 AI 訊息)
-              if (!isUser)
+              // 操作按鈕列 (僅 AI 訊息且非錯誤)
+              if (!isUser && !msg.isError)
                 padding(
                   const EdgeInsets.only(top: DesignSystem.space4),
                   row([
@@ -173,16 +188,59 @@ class _MessageBubbleState extends State<MessageBubble>
 
   Widget _buildAvatar() {
     return container(
-      icon(Icons.auto_awesome, 16, Colors.white),
+      icon(widget.message.isError ? Icons.error_outline : Icons.auto_awesome, 16, Colors.white),
       width: 28,
       height: 28,
       gradient: LinearGradient(
-        colors: [primary, secondary],
+        colors: widget.message.isError 
+            ? [Colors.redAccent, Colors.red] 
+            : [primary, secondary],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       radius: DesignSystem.borderS,
     );
+  }
+
+  Widget _buildErrorContent() {
+    return column([
+      row([
+        icon(Icons.warning_amber_rounded, 20, Colors.redAccent),
+        width(DesignSystem.space8),
+        expand(
+          text(
+            '連線錯誤',
+            16,
+            fw7,
+            Colors.redAccent,
+          ),
+        ),
+      ]),
+      height(DesignSystem.space8),
+      text(
+        widget.message.content,
+        14,
+        fw4,
+        tx1.withOpacity(0.8),
+      ),
+      height(DesignSystem.space16),
+      inkWell(
+        container(
+          row([
+            icon(Icons.refresh_rounded, 16, Colors.white),
+            width(DesignSystem.space8),
+            text('重新嘗試', 14, fw6, Colors.white),
+          ], ma: MainAxisAlignment.center),
+          padding: symmetric(DesignSystem.space12, DesignSystem.space8),
+          color: Colors.redAccent,
+          radius: DesignSystem.borderS,
+        ),
+        () {
+          HapticFeedback.mediumImpact();
+          widget.onRetry?.call();
+        },
+      ),
+    ], ca: CrossAxisAlignment.start);
   }
 
   Widget _buildUserAvatar() {
@@ -193,6 +251,25 @@ class _MessageBubbleState extends State<MessageBubble>
       color: bg2,
       radius: DesignSystem.borderS,
       border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+    );
+  }
+
+  Widget _buildImageGrid(List<String> images) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: images.map((img) {
+        return container(
+          Image.memory(
+            base64Decode(img),
+            fit: BoxFit.cover,
+          ),
+          width: 150,
+          height: 150,
+          radius: DesignSystem.borderS,
+          clip: Clip.antiAlias,
+        );
+      }).toList(),
     );
   }
 

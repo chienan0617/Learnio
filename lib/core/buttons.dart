@@ -40,11 +40,7 @@ class MenuButtonCtrler<T> {
   List<DropdownMenuItem<T>> getItems() {
     return values.map((v) => DropdownMenuItem(
       value: v,
-      child: Text(v.toString(), style: TextStyle(
-        color: tx1,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      )),
+      child: text(v.toString(), 18, fw6, tx1),
     )).toList();
   }
 }

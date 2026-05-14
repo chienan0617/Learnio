@@ -26,167 +26,164 @@ class _MorePageState extends State<MorePage> {
           icon: Icon(Icons.arrow_back_ios_new_outlined, color: tx1, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: text(
           "探索更多",
-          style: TextStyle(
-            color: tx1,
-            fontWeight: fw9,
-            letterSpacing: 1.2,
-            fontSize: 18,
-          ),
+          18,
+          fw9,
+          tx1,
+          false,
+          null,
+          fsN,
+          TextAlign.start,
+          null,
+          TextOverflow.clip,
+          1.2,
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            _buildBrandHeader(),
-            const SizedBox(height: 40),
-            _buildInfoCard(context),
-            const SizedBox(height: 40),
-          ],
-        ),
+        child: column([
+          height(30),
+          _buildBrandHeader(),
+          height(40),
+          _buildInfoCard(context),
+          height(40),
+        ]),
       ),
     );
   }
 
   // 頂部品牌區域
   Widget _buildBrandHeader() {
-    return Center(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: bg2,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: so1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+    return center(
+      column([
+        container(
+          Image.asset("assets/image/logo/logo.png", height: 70),
+          padding: const EdgeInsets.all(16),
+          color: bg2,
+          radius: BorderRadius.circular(24),
+          border: Border.all(color: so1),
+          shadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-            child: Image.asset("assets/image/logo/logo.png", height: 70),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "PCET_CHEINAN0617",
-            style: TextStyle(
-              fontSize: 12,
-              color: tx2,
-              fontWeight: fw6,
-              letterSpacing: 3,
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        height(16),
+        text(
+          "PCET_CHEINAN0617",
+          12,
+          fw6,
+          tx2,
+          false,
+          null,
+        ),
+      ]),
     );
   }
 
   // 資訊提示卡片
   Widget _buildInfoCard(BuildContext context) {
-    return Container(
+    return container(
+      row([
+        CircleAvatar(
+          backgroundColor: primary.withOpacity(0.1),
+          child: icon(Icons.devices_outlined, 20, primary),
+        ),
+        width(16),
+        expand(
+          column(
+            [
+              text(
+                "平台支援說明",
+                15,
+                fw7,
+                tx1,
+              ),
+              height(4),
+              text(
+                "目前均提供 Android, Windows, Linux, Web 跨平台版本。",
+                13,
+                fw4,
+                tx2,
+                false,
+                null,
+              ),
+            ],
+            ca: caS,
+          ),
+        ),
+      ]),
       margin: const EdgeInsets.only(bottom: 30),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: bg2, // 使用卡片背景色
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: so1),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: primary.withOpacity(0.1),
-            child: Icon(Icons.devices_outlined, color: primary, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: caS,
-              children: [
-                Text(
-                  "平台支援說明",
-                  style: TextStyle(fontWeight: fw7, fontSize: 15, color: tx1),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "目前均提供 Android, Windows, Linux, Web 跨平台版本。",
-                  style: TextStyle(fontSize: 13, color: tx2, height: 1.4),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      color: bg2, // 使用卡片背景色
+      radius: BorderRadius.circular(20),
+      border: Border.all(color: so1),
     );
   }
 
   // 產品卡片
   Widget _buildProductCard(Map<String, String> product) {
-    return InkWell(
-      onTap: () => _launchURL(product['url']!),
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: bg2,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: so1.withOpacity(0.5)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+    return inkWell(
+      container(
+        row([
+          container(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                product['logo']!,
+                width: 52,
+                height: 52,
+                fit: BoxFit.cover,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  product['logo']!,
-                  width: 52,
-                  height: 52,
-                  fit: BoxFit.cover,
+            ),
+            radius: BorderRadius.circular(12),
+            shadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          width(16),
+          expand(
+            column(
+              [
+                text(
+                  product['name']!,
+                  16,
+                  fw7,
+                  tx1,
                 ),
-              ),
+                height(4),
+                text(
+                  product['desc']!,
+                  12,
+                  fw4,
+                  tx3,
+                ),
+              ],
+              ca: caS,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: caS,
-                children: [
-                  Text(
-                    product['name']!,
-                    style: TextStyle(fontSize: 16, fontWeight: fw7, color: tx1),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product['desc']!,
-                    style: TextStyle(fontSize: 12, color: tx3),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.open_in_new_outlined,
-              size: 18,
-              color: tx3.withOpacity(0.5),
-            ),
-          ],
-        ),
+          ),
+          icon(
+            Icons.open_in_new_outlined,
+            18,
+            tx3.withOpacity(0.5),
+          ),
+        ]),
+        padding: const EdgeInsets.all(12),
+        color: bg2,
+        radius: BorderRadius.circular(16),
+        border: Border.all(color: so1.withOpacity(0.5)),
       ),
+      () => _launchURL(product['url']!),
+      radius: BorderRadius.circular(16),
     );
   }
 }
@@ -199,29 +196,27 @@ Widget more(
   final VoidCallback onTap =
       fn ?? () => launchUrl(Uri.parse("https://chienan0617.github.io/brand"));
 
-  return Center(
+  return center(
     // 確保在 AppBar 中垂直置中
-    child: Padding(
-      padding: const EdgeInsets.only(right: 16.0), // AppBar 右側邊距
-      child: Badge(
+    padding(
+      const EdgeInsets.only(right: 16.0), // AppBar 右側邊距
+      Badge(
         backgroundColor: CommonColors.error,
         smallSize: 8,
         offset: const Offset(2, -2), // 讓紅點稍微向外浮出
         // 使用你的自訂 gestureDetector 包裝點擊事件
         child: gestureDetector(
-          Container(
+          container(
+            // 文字顏色使用 tx1，並稍微縮小字級配合 AppBar 比例
+            text(s, 14, fw6, tx1),
             // 縮小 padding 以適應 AppBar 的高度限制
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              // 完全呼應你 _buildMenuButton (isPrimary = false) 的風格
-              color: tx1.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(
-                12,
-              ), // 對齊你的 borderCircular(12)
-              border: Border.all(color: tx1.withOpacity(0.2)),
-            ),
-            // 文字顏色使用 tx1，並稍微縮小字級配合 AppBar 比例
-            child: text(s, 14, fw6, tx1),
+            // 完全呼應你 _buildMenuButton (isPrimary = false) 的風格
+            color: tx1.withOpacity(0.1),
+            radius: BorderRadius.circular(
+              12,
+            ), // 對齊你的 borderCircular(12)
+            border: Border.all(color: tx1.withOpacity(0.2)),
           ),
           onTap,
         ),

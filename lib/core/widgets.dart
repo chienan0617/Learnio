@@ -19,8 +19,11 @@ Text text(
   TextAlign align = TextAlign.start,
   int? maxLines,
   TextOverflow overflow = TextOverflow.clip,
+  double? ls,
+  Key? key,
 ]) => Text(
   translate ? word(msg) : msg,
+  key: key,
   textAlign: align,
   maxLines: maxLines,
   overflow: overflow,
@@ -29,7 +32,7 @@ Text text(
     fontWeight: weight,
     fontStyle: style,
     color: color ?? tx1,
-    letterSpacing: 0,
+    letterSpacing: ls,
     fontFamily: fontFamily,
   ),
 );
@@ -95,13 +98,17 @@ IconButton iconButton(Icon icon, [fn, Color? color, double? size]) =>
 //     : c;
 
 InkWell inkWell(
-  Widget v, [
-  VoidCallback? fn,
+  Widget v,
+  VoidCallback? fn, {
+  BorderRadius? radius,
+  VoidCallback? onLongPress,
   Color splash = transparent,
   Color? focus,
   Color? hover,
-]) => InkWell(
+}) => InkWell(
   onTap: fn,
+  onLongPress: onLongPress,
+  borderRadius: radius,
   splashColor: splash,
   focusColor: focus,
   hoverColor: hover,
@@ -124,7 +131,9 @@ Widget container(
   List<BoxShadow>? shadow,
   AlignmentGeometry? alignment,
   Gradient? gradient,
+  DecorationImage? image,
   BoxShape shape = BoxShape.rectangle,
+  Clip clip = Clip.none,
 }) =>
     Container(
       key: key,
@@ -133,8 +142,10 @@ Widget container(
       padding: padding,
       margin: margin,
       alignment: alignment,
+      clipBehavior: clip,
       decoration: BoxDecoration(
         color: color,
+        image: image,
         borderRadius: shape == BoxShape.circle ? null : radius,
         border: border,
         boxShadow: shadow,

@@ -5,7 +5,7 @@ import 'package:learnio/pages/root/root.dart';
 mixin TutorialPageIntroductionCtrler {
   final PageController pageCtrler = PageController();
 
-  static bool isTutored() => true; //Data.app.get<bool>("tutored");
+  static bool isTutored() => Data.app.get<bool>("tutored", false);
 
   static List<Map<String, dynamic>> getPagesData() {
     return [
@@ -61,13 +61,10 @@ mixin TutorialPageIntroductionCtrler {
 
   void finishTutorial(BuildContext context) {
     Data.app.put("tutored", true); // 標記已完成導覽
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RootPage()),
-    );
+    
+    // 重建 Main 以切換 home
+    rebuild('main');
 
     DesktopInstallHelper.onHowToInstallToDesktopButtonPressed(context);
-    // HomePageTaskDisplayFuncWidget.showUserGuide(context);
   }
 }

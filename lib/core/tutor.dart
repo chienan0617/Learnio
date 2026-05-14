@@ -91,13 +91,11 @@ class Tutorial implements Initialable {
           contents: [
             TargetContent(
               align: align,
-              builder: (context, controller) => Text(
+              builder: (context, controller) => text(
                 intro,
-                style: TextStyle(
-                  color: tx1,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                20,
+                fw6,
+                tx1,
               ),
             ),
           ],

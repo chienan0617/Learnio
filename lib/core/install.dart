@@ -34,21 +34,15 @@ class DesktopInstallHelper {
         child: center(
           padding(
             symmetricH(30),
-            Container(
-              width: 320,
-              padding: symmetricAll(24),
-              decoration: BoxDecoration(
-                color: bg2,
-                borderRadius: borderCircular(24),
-                border: Border.all(color: so1, width: 1),
-              ),
-              child: column([
+            container(
+              column([
                 // 標題列
                 row([
                   text("安裝到桌面", 20, fw7, tx1, false, faSg),
                   spacer(),
                   // 這裡的 inkWell 需要 Material 祖先
-                  inkWell(icon(Icons.close_outlined, 20, tx3), () => popPage(ctx)),
+                  inkWell(
+                      icon(Icons.close_outlined, 20, tx3), () => popPage(ctx)),
                 ], ma: spB),
 
                 height(24),
@@ -65,14 +59,12 @@ class DesktopInstallHelper {
 
                 // 底部按鈕
                 inkWell(
-                  Container(
+                  container(
+                    center(text("我知道了", 16, fw7, tx1p)),
                     width: double.infinity,
                     height: 52,
-                    decoration: BoxDecoration(
-                      color: primary,
-                      borderRadius: borderCircular(14),
-                    ),
-                    child: center(text("我知道了", 16, fw7, tx1p)),
+                    color: primary,
+                    radius: borderCircular(14),
                   ),
                   () => popPage(ctx),
                 ),
@@ -116,27 +108,23 @@ class DesktopInstallHelper {
   ]);
 
   static Widget _guideStep(String num, String desc) => row([
-    Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: primary.withOpacity(0.15),
-        borderRadius: borderCircular(12),
-      ),
-      child: center(text(num, 12, fw8, primary)),
-    ),
+        container(
+          center(text(num, 12, fw8, primary)),
+          width: 24,
+          height: 24,
+          color: primary.withOpacity(0.15),
+          radius: borderCircular(12),
+        ),
     width(12),
     expand(text(desc, 15, fw5, tx1)),
   ]);
 
   static Widget _buildStepIcon(IconData i, Color c) => center(
-    Container(
-      padding: symmetricAll(24),
-      decoration: BoxDecoration(
-        color: c.withOpacity(0.1),
-        shape: BoxShape.circle,
-      ),
-      child: icon(i, 44, c),
-    ),
-  );
+        container(
+          icon(i, 44, c),
+          padding: symmetricAll(24),
+          color: c.withOpacity(0.1),
+          shape: BoxShape.circle,
+        ),
+      );
 }
