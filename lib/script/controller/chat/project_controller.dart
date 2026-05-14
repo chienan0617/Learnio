@@ -1,4 +1,5 @@
 import 'package:learnio/base.dart';
+import 'package:learnio/script/controller/data/data_controller.dart';
 import 'package:learnio/script/types/project.dart';
 
 class ProjectController {
@@ -8,7 +9,17 @@ class ProjectController {
   List<Project> get projects => List.unmodifiable(_projects);
 
   ProjectController() {
-    _loadMockData();
+    _loadFromStorage();
+  }
+
+  void _loadFromStorage() {
+    final stored = DataController.getProjects();
+    if (stored.isEmpty) {
+      _loadMockData();
+    } else {
+      _projects.addAll(stored);
+      _projects.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
   }
 
   Project createProject({
@@ -24,25 +35,31 @@ class ProjectController {
       color: color ?? primary,
     );
     _projects.insert(0, project);
+    DataController.saveProject(project);
     onStateChanged?.call();
     return project;
   }
 
   void deleteProject(String id) {
     _projects.removeWhere((p) => p.id == id);
+    DataController.deleteProject(id);
     onStateChanged?.call();
   }
 
   void addConversationToProject(String projectId, String conversationId) {
-    final project = _projects.firstWhere((p) => p.id == projectId);
-    if (!project.conversationIds.contains(conversationId)) {
-      project.conversationIds.add(conversationId);
-      onStateChanged?.call();
+    final index = _projects.indexWhere((p) => p.id == projectId);
+    if (index != -1) {
+      final project = _projects[index];
+      if (!project.conversationIds.contains(conversationId)) {
+        project.conversationIds.add(conversationId);
+        DataController.saveProject(project);
+        onStateChanged?.call();
+      }
     }
   }
 
   void _loadMockData() {
-    _projects.addAll([
+    final mockData = [
       Project(
         id: 'proj_mock_1',
         name: 'Flutter 學習',
@@ -59,6 +76,10 @@ class ProjectController {
         createdAt: DateTime.now().subtract(const Duration(days: 14)),
         color: hexColor('#8B5CF6'),
       ),
-    ]);
+    ];
+    _projects.addAll(mockData);
+    for (var p in mockData) {
+      DataController.saveProject(p);
+    }
   }
 }

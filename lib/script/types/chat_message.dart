@@ -1,12 +1,36 @@
 
-enum MessageRole { user, assistant, system }
+import 'package:learnio/base.dart';
 
+part 'chat_message.g.dart';
+
+@HiveType(typeId: 50)
+enum MessageRole {
+  @HiveField(0)
+  user,
+  @HiveField(1)
+  assistant,
+  @HiveField(2)
+  system
+}
+
+@HiveType(typeId: 51)
 class ChatMessage {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String conversationId;
+
+  @HiveField(2)
   final MessageRole role;
+
+  @HiveField(3)
   final String content;
+
+  @HiveField(4)
   final DateTime timestamp;
+
+  @HiveField(5)
   bool isFavorite;
 
   ChatMessage({

@@ -34,24 +34,24 @@ class CommonColors {
     hexColor("#2d3436"),
   ];
 
-  static final success = darkMode ? hexColor("#10B981") : hexColor("#059669");
-  static final successSoft = darkMode
+  static Color get success => darkMode ? hexColor("#10B981") : hexColor("#059669");
+  static Color get successSoft => darkMode
       ? hexColor("#064E3B")
       : hexColor("#D1FAE5");
 
   // 錯誤 (Error/Danger)
-  static final error = darkMode ? hexColor("#EF4444") : hexColor("#DC2626");
-  static final errorSoft = hexColor("#FEE2E2");
+  static Color get error => darkMode ? hexColor("#EF4444") : hexColor("#DC2626");
+  static Color get errorSoft => hexColor("#FEE2E2");
   //darkMode ? hexColor("#450A0A") :
   // 警告 (Warning)
-  static final warning = darkMode ? hexColor("#F59E0B") : hexColor("#D97706");
-  static final warningSoft = darkMode
+  static Color get warning => darkMode ? hexColor("#F59E0B") : hexColor("#D97706");
+  static Color get warningSoft => darkMode
       ? hexColor("#451A03")
       : hexColor("#FEF3C7");
 
   // 資訊 (Info)
-  static final info = darkMode ? hexColor("#0EA5E9") : hexColor("#0284C7");
-  static final infoSoft = darkMode ? hexColor("#0C4A6E") : hexColor("#E0F2FE");
+  static Color get info => darkMode ? hexColor("#0EA5E9") : hexColor("#0284C7");
+  static Color get infoSoft => darkMode ? hexColor("#0C4A6E") : hexColor("#E0F2FE");
 
   // ---------------------------------------------------------
   // 輔助裝飾色 (Accent / Decorative)

@@ -55,85 +55,77 @@ class _SideBarState extends State<SideBar> {
       surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildSearchBar(),
-            Expanded(
-              child: _isSearching ? _buildSearchResults() : _buildMainMenu(),
-            ),
-            const Divider(height: 1, thickness: 0.5, color: Colors.white10),
-            _buildFooter(),
-          ],
-        ),
+        child: column([
+          _buildHeader(),
+          _buildSearchBar(),
+          expand(
+            _isSearching ? _buildSearchResults() : _buildMainMenu(),
+          ),
+          const Divider(height: 1, thickness: 0.5, color: Colors.white10),
+          _buildFooter(),
+        ], ms: MainAxisSize.max),
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-          DesignSystem.space20, DesignSystem.space20, DesignSystem.space20, DesignSystem.space12),
-      child: Row(
-        children: [
-          // Logo
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [primary, secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: DesignSystem.borderM,
-              boxShadow: [
-                BoxShadow(
-                  color: primary.withOpacity(0.2),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: const Icon(Icons.auto_awesome, size: 24, color: Colors.white),
-          ),
-          const SizedBox(width: DesignSystem.space12),
-          Text('Learnio', style: tsTitleLarge),
-          const Spacer(),
-          // 新對話按鈕
-          InkWell(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              widget.onNewConversation();
-              Navigator.pop(context);
-            },
-            borderRadius: DesignSystem.borderM,
-            child: Container(
-              padding: const EdgeInsets.all(DesignSystem.space8),
-              decoration: BoxDecoration(
-                color: bg2,
-                borderRadius: DesignSystem.borderM,
-                border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
-              ),
-              child: Icon(Icons.edit_square, size: 20, color: tx1),
-            ),
-          ),
-        ],
+    return padding(
+      const EdgeInsets.fromLTRB(
+        DesignSystem.space20,
+        DesignSystem.space20,
+        DesignSystem.space20,
+        DesignSystem.space12,
       ),
+      row([
+        // Logo
+        container(
+          icon(Icons.auto_awesome_outlined, 24, Colors.white),
+          width: 42,
+          height: 42,
+          gradient: LinearGradient(
+            colors: [primary, secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          radius: DesignSystem.borderM,
+          shadow: [
+            BoxShadow(
+              color: primary.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        width(DesignSystem.space12),
+        text('Learnio', 22, fw7),
+        spacer(),
+        // 新對話按鈕
+        inkWell(
+          container(
+            icon(Icons.add_rounded, 20, tx1),
+            padding: symmetricAll(DesignSystem.space8),
+            color: bg2,
+            radius: DesignSystem.borderM,
+            border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+          ),
+          () {
+            HapticFeedback.lightImpact();
+            widget.onNewConversation();
+            Navigator.pop(context);
+          },
+        ),
+      ]),
     );
   }
 
   Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: DesignSystem.space16, vertical: DesignSystem.space8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: bg2,
-          borderRadius: DesignSystem.borderXL,
-          border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
-        ),
-        child: TextField(
+    return padding(
+      const EdgeInsets.symmetric(
+        horizontal: DesignSystem.space16,
+        vertical: DesignSystem.space8,
+      ),
+      container(
+        TextField(
           controller: _searchCtrl,
           onChanged: _onSearch,
           style: tsBodyMedium.copyWith(color: tx1),
@@ -141,11 +133,11 @@ class _SideBarState extends State<SideBar> {
           decoration: InputDecoration(
             hintText: '搜尋對話...',
             hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
-            prefixIcon: Icon(Icons.search_rounded, color: tx6, size: 20),
+            prefixIcon: icon(Icons.search_outlined, 20, tx6),
             suffixIcon: _isSearching
-                ? IconButton(
-                    icon: Icon(Icons.close_rounded, color: tx6, size: 18),
-                    onPressed: () {
+                ? iconButton(
+                    icon(Icons.close_outlined, 18, tx6),
+                    () {
                       _searchCtrl.clear();
                       _onSearch('');
                     },
@@ -155,6 +147,9 @@ class _SideBarState extends State<SideBar> {
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
         ),
+        color: bg2,
+        radius: DesignSystem.borderXL,
+        border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
       ),
     );
   }
@@ -165,107 +160,239 @@ class _SideBarState extends State<SideBar> {
 
     return ListView(
       padding: const EdgeInsets.symmetric(
-          horizontal: DesignSystem.space12, vertical: DesignSystem.space8),
+        horizontal: DesignSystem.space12,
+        vertical: DesignSystem.space8,
+      ),
       children: [
         // 功能選單
-        _menuItem(Icons.chat_rounded, '聊天', 'chat'),
-        _menuItem(Icons.folder_rounded, '專案', 'project'),
-        _menuItem(Icons.bookmark_rounded, '收藏', 'favorite'),
-        _menuItem(Icons.school_rounded, '學習庫', 'learning'),
-        _menuItem(Icons.settings_rounded, '設定', 'settings'),
+        _menuItem(Icons.chat_outlined, '聊天', 'chat'),
+        _menuItem(Icons.folder_outlined, '專案', 'project'),
+        _menuItem(Icons.bookmark_outlined, '收藏', 'favorite'),
+        _menuItem(Icons.school_outlined, '學習庫', 'learning'),
+        _menuItem(Icons.settings_outlined, '設定', 'settings'),
 
         // 分隔線
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-              DesignSystem.space8, DesignSystem.space20, DesignSystem.space8, DesignSystem.space8),
-          child: Row(children: [
-            Text('最近對話', style: tsCaption.copyWith(fontWeight: fw7)),
-            const Spacer(),
-            Text('${conversations.length}',
-                style: tsCaption.copyWith(color: tx6.withOpacity(0.5))),
+        padding(
+          const EdgeInsets.fromLTRB(
+            DesignSystem.space8,
+            DesignSystem.space20,
+            DesignSystem.space8,
+            DesignSystem.space8,
+          ),
+          row([
+            text('最近對話', 12, fw7, tx6),
+            spacer(),
+            text(
+              '${conversations.length}',
+              12,
+              fw5,
+              tx6.withOpacity(0.5),
+            ),
           ]),
         ),
 
         // 歷史列表
         ...conversations.map((conv) {
           final isActive = conv.id == currentId;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 4),
-            decoration: BoxDecoration(
-              color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
-              borderRadius: DesignSystem.borderM,
-            ),
-            child: ListTile(
+          return container(
+            ListTile(
               onTap: () {
                 HapticFeedback.lightImpact();
                 widget.onSelectConversation(conv.id);
                 Navigator.pop(context);
               },
-              onLongPress: () {
-                HapticFeedback.mediumImpact();
-                _showDeleteConvDialog(conv.id, conv.title);
-              },
               dense: true,
               visualDensity: VisualDensity.compact,
-              leading: Icon(Icons.chat_bubble_outline_rounded,
-                  size: 16, color: isActive ? primary : tx6),
-              title: Text(conv.title,
-                  style: tsBodyMedium.copyWith(
-                    color: isActive ? tx1 : tx2,
-                    fontWeight: isActive ? fw6 : fw4,
+              leading: icon(
+                Icons.chat_bubble_outline_rounded,
+                16,
+                isActive ? primary : tx6,
+              ),
+              title: text(
+                conv.title,
+                14,
+                isActive ? fw6 : fw4,
+                isActive ? tx1 : tx2,
+                false,
+                null,
+                fsN,
+                TextAlign.start,
+                1,
+                TextOverflow.ellipsis,
+              ),
+              subtitle: text(
+                conv.timeLabel,
+                10,
+                fw4,
+                tx6.withOpacity(0.6),
+              ),
+              trailing: PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: icon(
+                  Icons.more_vert_rounded,
+                  16,
+                  tx6.withOpacity(0.5),
+                ),
+                onSelected: (value) {
+                  if (value == 'rename') {
+                    _showRenameConvDialog(conv.id, conv.title);
+                  } else if (value == 'delete') {
+                    _showDeleteConvDialog(conv.id, conv.title);
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'rename',
+                    height: 32,
+                    child: row([
+                      icon(Icons.edit_outlined, 14, tx2),
+                      width(8),
+                      text('重新命名', 12, fw4, tx6),
+                    ]),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
-              subtitle: Text(conv.timeLabel,
-                  style: tsCaption.copyWith(fontSize: 10, color: tx6.withOpacity(0.6))),
+                  PopupMenuItem(
+                    value: 'delete',
+                    height: 32,
+                    child: row([
+                      icon(
+                        Icons.delete_outline_rounded,
+                        14,
+                        CommonColors.error,
+                      ),
+                      width(8),
+                      text(
+                        '刪除',
+                        12,
+                        fw4,
+                        CommonColors.error,
+                      ),
+                    ]),
+                  ),
+                ],
+              ),
               shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
             ),
+            margin: const EdgeInsets.only(bottom: 4),
+            color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
+            radius: DesignSystem.borderM,
           );
         }),
       ],
     );
   }
 
-  Widget _menuItem(IconData icon, String title, String key) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      child: ListTile(
+  void _showRenameConvDialog(String id, String oldTitle) {
+    final ctrl = TextEditingController(text: oldTitle);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: bg1_5,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: text('重新命名對話', 22, fw7),
+        content: TextField(
+          controller: ctrl,
+          style: tsBodyMedium,
+          autofocus: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: bg2,
+            border: OutlineInputBorder(
+              borderRadius: DesignSystem.borderM,
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: text('取消', 14, fw4, tx6),
+          ),
+          TextButton(
+            onPressed: () {
+              final newTitle = ctrl.text.trim();
+              if (newTitle.isNotEmpty) {
+                widget.conversationController.renameConversation(id, newTitle);
+                Navigator.pop(ctx);
+                setState(() {});
+              }
+            },
+            child: text('確定', 14, fw4, primary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConvDialog(String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: bg1_5,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
+        title: text('刪除對話？', 22, fw7),
+        content: text('確定要刪除「$title」嗎？', 14, fw4, tx2),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: text('取消', 14, fw4, tx6),
+          ),
+          TextButton(
+            onPressed: () {
+              widget.conversationController.deleteConversation(id);
+              Navigator.pop(ctx);
+              setState(() {});
+            },
+            child: text('刪除', 14, fw4, CommonColors.error),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _menuItem(IconData iconData, String title, String key) {
+    return container(
+      ListTile(
         onTap: () {
           HapticFeedback.lightImpact();
           widget.onNavigate(key);
           Navigator.pop(context);
         },
         dense: true,
-        leading: Icon(icon, size: 22, color: tx1.withOpacity(0.8)),
-        title: Text(title, style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6)),
+        leading: icon(iconData, 22, tx1.withOpacity(0.8)),
+        title: text(title, 14, fw6, tx1),
         shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
         hoverColor: bg2,
         splashColor: primary.withOpacity(0.1),
       ),
+      margin: const EdgeInsets.only(bottom: 4),
     );
   }
 
   Widget _buildSearchResults() {
     if (_searchResults.isEmpty) {
-      return Center(
-        child: Text('找不到結果', style: tsBodyMedium.copyWith(color: tx6)),
+      return center(
+        text('找不到結果', 14, fw4, tx6),
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
-          horizontal: DesignSystem.space12, vertical: DesignSystem.space8),
+        horizontal: DesignSystem.space12,
+        vertical: DesignSystem.space8,
+      ),
       itemCount: _searchResults.length,
       itemBuilder: (_, i) {
         final r = _searchResults[i];
-        IconData icon;
+        IconData iconData;
         switch (r.type) {
           case SearchResultType.conversation:
-            icon = Icons.chat_bubble_outline_rounded;
+            iconData = Icons.chat_bubble_outline_rounded;
           case SearchResultType.message:
-            icon = Icons.textsms_outlined;
+            iconData = Icons.textsms_outlined;
           case SearchResultType.project:
-            icon = Icons.folder_outlined;
+            iconData = Icons.folder_outlined;
         }
 
         return ListTile(
@@ -279,13 +406,31 @@ class _SideBarState extends State<SideBar> {
             Navigator.pop(context);
           },
           dense: true,
-          leading: Icon(icon, size: 18, color: tx6),
-          title: Text(r.title,
-              style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw6),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis),
-          subtitle: Text(r.subtitle,
-              style: tsCaption, maxLines: 2, overflow: TextOverflow.ellipsis),
+          leading: icon(iconData, 18, tx6),
+          title: text(
+            r.title,
+            14,
+            fw6,
+            tx1,
+            false,
+            null,
+            fsN,
+            TextAlign.start,
+            1,
+            TextOverflow.ellipsis,
+          ),
+          subtitle: text(
+            r.subtitle,
+            12,
+            fw4,
+            tx6,
+            false,
+            null,
+            fsN,
+            TextAlign.start,
+            2,
+            TextOverflow.ellipsis,
+          ),
           shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
         );
       },
@@ -293,89 +438,68 @@ class _SideBarState extends State<SideBar> {
   }
 
   Widget _buildFooter() {
-    return Padding(
-      padding: const EdgeInsets.all(DesignSystem.space16),
-      child: InkWell(
-        onTap: () {
-          // TODO: 使用者資訊
-        },
-        borderRadius: DesignSystem.borderM,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-              vertical: DesignSystem.space12, horizontal: DesignSystem.space12),
-          decoration: BoxDecoration(
-            color: bg2,
-            borderRadius: DesignSystem.borderM,
-            border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
-          ),
-          child: Row(children: [
+    return padding(
+      const EdgeInsets.all(DesignSystem.space16),
+      inkWell(
+        container(
+          row([
             // 頭像佔位
-            Container(
+            container(
+              icon(Icons.person_rounded, 20, primary),
               width: 32,
               height: 32,
-              decoration: BoxDecoration(
-                color: primary.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.person_rounded, size: 20, color: primary),
+              color: primary.withOpacity(0.2),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: DesignSystem.space12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Premium User',
-                      style: tsBodyMedium.copyWith(fontWeight: fw7, fontSize: 13)),
-                  Text('Version ${System.version}',
-                      style: tsCaption.copyWith(fontSize: 10, color: tx6)),
+            width(DesignSystem.space12),
+            expand(
+              column(
+                [
+                  text(
+                    'Premium User',
+                    13,
+                    fw7,
+                  ),
+                  text(
+                    'Version ${System.version}',
+                    10,
+                    fw4,
+                    tx6,
+                  ),
                 ],
+                ca: CrossAxisAlignment.start,
               ),
             ),
-            const SizedBox(width: DesignSystem.space8),
+            width(DesignSystem.space8),
             buildAlphaTag(),
           ]),
+          padding: symmetric(DesignSystem.space12, DesignSystem.space12),
+          color: bg2,
+          radius: DesignSystem.borderM,
+          border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
         ),
-      ),
-    );
-  }
-
-  void _showDeleteConvDialog(String id, String title) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: bg1_5,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderL),
-        title: Text('刪除對話？', style: tsTitleLarge),
-        content: Text('確定要刪除「$title」嗎？', style: tsBodyMedium),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('取消', style: tsBodyMedium.copyWith(color: tx6)),
-          ),
-          TextButton(
-            onPressed: () {
-              widget.conversationController.deleteConversation(id);
-              Navigator.pop(ctx);
-              setState(() {});
-            },
-            child: Text('刪除', style: tsBodyMedium.copyWith(color: CommonColors.error)),
-          ),
-        ],
+        () {
+          // TODO: 使用者資訊
+        },
       ),
     );
   }
 }
 
 Widget buildAlphaTag() {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-    decoration: BoxDecoration(
-      color: Colors.orangeAccent.withOpacity(0.1),
-      borderRadius: DesignSystem.borderS,
-      border: Border.all(color: Colors.orangeAccent.withOpacity(0.3), width: 0.5),
+  return container(
+    text(
+      'ALPHA',
+      9,
+      fw7,
+      Colors.orangeAccent,
     ),
-    child: const Text('ALPHA',
-        style: TextStyle(color: Colors.orangeAccent, fontSize: 9, fontWeight: fw7)),
+    padding: symmetric(6, 2),
+    color: Colors.orangeAccent.withOpacity(0.1),
+    radius: DesignSystem.borderS,
+    border: Border.all(
+      color: Colors.orangeAccent.withOpacity(0.3),
+      width: 0.5,
+    ),
   );
 }

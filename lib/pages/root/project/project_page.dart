@@ -84,7 +84,7 @@ class _ProjectPageState extends State<ProjectPage> {
               color: bg2,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.folder_open_rounded, size: 48, color: tx6.withOpacity(0.5)),
+            child: Icon(Icons.folder_open_outlined, size: 48, color: tx6.withOpacity(0.5)),
           ),
           const SizedBox(height: DesignSystem.space24),
           Text('還沒有任何專案', style: tsTitleMedium.copyWith(color: tx6)),

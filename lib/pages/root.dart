@@ -1,5 +1,6 @@
 import 'package:learnio/base.dart';
 import 'package:learnio/pages/root/root.dart';
+import 'package:learnio/pages/tutorial/tutorial.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -17,6 +18,9 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    // 檢查是否已看過導覽
+    final bool isTutored = Data.app.get<bool>("tutored", false);
+
     return MaterialApp(
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
         overscroll: false,
@@ -26,7 +30,7 @@ class _MainPageState extends State<MainPage> {
         brightness: darkMode ? Brightness.dark : Brightness.light,
         primaryColor: primary,
       ),
-      home: const RootPage(),
+      home: isTutored ? const RootPage() : const TutorialIntroductionPage(),
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context)

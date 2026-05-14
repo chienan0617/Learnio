@@ -57,163 +57,114 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return container(
+      container(
+        column([
+          // 模型選擇與附件預覽 (頂部工具列)
+          padding(
+            symmetric(DesignSystem.space12, DesignSystem.space8),
+            row([
+              ModelSelector(
+                chatController: widget.chatController,
+                onChanged: () => setState(() {}),
+              ),
+              const Spacer(),
+              // 附件按鈕
+              iconButton(icon(Icons.add_circle_outline, 22, tx6), () async {
+                HapticFeedback.lightImpact();
+              }),
+            ]),
+          ),
+
+          Divider(color: bg3.withOpacity(0.3), height: 1),
+
+          // 輸入區
+          row([
+            width(DesignSystem.space12),
+            // 文字輸入框
+            expand(
+              TextField(
+                controller: _textController,
+                focusNode: _focusNode,
+                style: tsBodyLarge.copyWith(fontSize: 17),
+                maxLines: 5,
+                minLines: 1,
+                textInputAction: TextInputAction.newline,
+                decoration: InputDecoration(
+                  hintText: widget.hintText ?? '詢問任何問題...',
+                  hintStyle: tsBodyLarge.copyWith(
+                    color: tx6.withOpacity(0.5),
+                    fontSize: 17,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DesignSystem.space8,
+                    vertical: DesignSystem.space12,
+                  ),
+                ),
+                cursorColor: primary,
+              ),
+            ),
+
+            // 語音按鈕 / 送出按鈕
+            padding(
+              const EdgeInsets.only(
+                right: DesignSystem.space8,
+                bottom: DesignSystem.space8,
+              ),
+              AnimatedSwitcher(
+                duration: DesignSystem.animFast,
+                transitionBuilder: (child, anim) {
+                  return ScaleTransition(scale: anim, child: child);
+                },
+                child: _hasText ? _buildSendButton() : _buildVoiceButton(),
+              ),
+            ),
+          ], ca: CrossAxisAlignment.end),
+        ]),
+        color: bg2,
+        radius: DesignSystem.borderXL,
+        border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+        shadow: DesignSystem.shadowSoft,
+      ),
       padding: EdgeInsets.only(
         left: DesignSystem.space12,
         right: DesignSystem.space12,
         top: DesignSystem.space12,
         bottom: MediaQuery.of(context).padding.bottom + DesignSystem.space16,
       ),
-      decoration: BoxDecoration(
-        color: bg1,
-        border: Border(
-          top: BorderSide(color: bg3.withOpacity(0.3), width: 0.5),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: bg2,
-          borderRadius: DesignSystem.borderXL,
-          border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
-          boxShadow: DesignSystem.shadowSoft,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 模型選擇與附件預覽 (頂部工具列)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DesignSystem.space12,
-                vertical: DesignSystem.space8,
-              ),
-              child: Row(
-                children: [
-                  ModelSelector(
-                    chatController: widget.chatController,
-                    onChanged: () => setState(() {}),
-                  ),
-                  const Spacer(),
-                  // 附件按鈕
-                  IconButton(
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-                      // final result = await FilePicker.platform.pickFiles(
-                      //   allowMultiple: true,
-                      // );
-                      // if (result != null) {
-                      //   widget.onFilesSelected?.call(result.files);
-                      // }
-                    },
-                    icon: Icon(
-                      Icons.add_circle_outline_rounded,
-                      color: tx6,
-                      size: 22,
-                    ),
-                    splashRadius: 20,
-                    padding: const EdgeInsets.all(DesignSystem.space8),
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-
-            Divider(color: bg3.withOpacity(0.3), height: 1),
-
-            // 輸入區
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const SizedBox(width: DesignSystem.space12),
-                // 文字輸入框
-                Expanded(
-                  child: TextField(
-                    controller: _textController,
-                    focusNode: _focusNode,
-                    style: tsBodyLarge.copyWith(fontSize: 17),
-                    maxLines: 5,
-                    minLines: 1,
-                    textInputAction: TextInputAction.newline,
-                    decoration: InputDecoration(
-                      hintText: widget.hintText ?? '詢問任何問題...',
-                      hintStyle: tsBodyLarge.copyWith(
-                        color: tx6.withOpacity(0.5),
-                        fontSize: 17,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: DesignSystem.space8,
-                        vertical: DesignSystem.space12,
-                      ),
-                    ),
-                    cursorColor: primary,
-                  ),
-                ),
-
-                // 語音按鈕 / 送出按鈕
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: DesignSystem.space8,
-                    bottom: DesignSystem.space8,
-                  ),
-                  child: AnimatedSwitcher(
-                    duration: DesignSystem.animFast,
-                    transitionBuilder: (child, anim) {
-                      return ScaleTransition(scale: anim, child: child);
-                    },
-                    child: _hasText ? _buildSendButton() : _buildVoiceButton(),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      color: bg1,
+      border: Border(top: BorderSide(color: bg3.withOpacity(0.3), width: 0.5)),
     );
   }
 
   Widget _buildSendButton() {
-    return Container(
+    return container(
+      iconButton(
+        icon(Icons.arrow_upward_outlined, 20, Colors.white),
+        _handleSend,
+      ),
       key: const ValueKey('send'),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [primary, secondary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: DesignSystem.borderL,
-        boxShadow: [
-          BoxShadow(
-            color: primary.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+      gradient: LinearGradient(
+        colors: [primary, secondary],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ),
-      child: IconButton(
-        onPressed: _handleSend,
-        icon: const Icon(
-          Icons.arrow_upward_rounded,
-          color: Colors.white,
-          size: 20,
+      radius: DesignSystem.borderL,
+      shadow: [
+        BoxShadow(
+          color: primary.withOpacity(0.3),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
         ),
-        splashRadius: 20,
-        padding: const EdgeInsets.all(DesignSystem.space8),
-        constraints: const BoxConstraints(),
-      ),
+      ],
     );
   }
 
   Widget _buildVoiceButton() {
-    return IconButton(
-      key: const ValueKey('voice'),
-      onPressed: () {
-        HapticFeedback.lightImpact();
-        widget.onVoicePressed?.call();
-      },
-      icon: Icon(Icons.mic_none_rounded, color: tx6, size: 24),
-      splashRadius: 20,
-      padding: const EdgeInsets.all(DesignSystem.space8),
-      constraints: const BoxConstraints(),
-    );
+    return iconButton(icon(Icons.mic_outlined, 24, tx6), () {
+      HapticFeedback.lightImpact();
+      widget.onVoicePressed?.call();
+    });
   }
 }

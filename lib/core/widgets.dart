@@ -2,8 +2,8 @@ import 'package:learnio/base.dart';
 
 SizedBox width([v = 0.0]) => SizedBox(width: v.toDouble());
 SizedBox height([v = 0.0]) => SizedBox(height: v.toDouble());
-SizedBox box([w = 0.0, h = 0.0, Widget? c]) =>
-    SizedBox(width: w.toDouble(), height: h.toDouble(), child: c);
+SizedBox box([w = 0.0, h = 0.0, Widget? c, Key? key]) =>
+    SizedBox(key: key, width: w.toDouble(), height: h.toDouble(), child: c);
 SizedBox boxV(v) => SizedBox(child: v);
 
 Size size(ctx) => MediaQuery.of(ctx).size;
@@ -16,8 +16,14 @@ Text text(
   bool translate = false,
   String? fontFamily,
   FontStyle style = fsN,
+  TextAlign align = TextAlign.start,
+  int? maxLines,
+  TextOverflow overflow = TextOverflow.clip,
 ]) => Text(
   translate ? word(msg) : msg,
+  textAlign: align,
+  maxLines: maxLines,
+  overflow: overflow,
   style: TextStyle(
     fontSize: size,
     fontWeight: weight,
@@ -69,7 +75,8 @@ SingleChildScrollView scroll(Widget v, [ScrollPhysics? p]) =>
 Icon icon(IconData icon, [double size = 20, Color? color, FontWeight? fw]) =>
     Icon(icon, size: size, color: color ?? tx1, fontWeight: fw);
 
-IconButton iconButton(Icon icon, [fn]) => IconButton(onPressed: fn, icon: icon);
+IconButton iconButton(Icon icon, [fn, Color? color, double? size]) =>
+    IconButton(onPressed: fn, icon: icon, color: color, iconSize: size);
 
 // Widget liquidGlass(
 //   Widget c, {
@@ -104,6 +111,39 @@ InkWell inkWell(
 GestureDetector gestureDetector(Widget v, [tap, longPress]) =>
     GestureDetector(onTap: tap, onLongPress: longPress, child: v);
 
+Widget container(
+  Widget v, {
+  Key? key,
+  double? width,
+  double? height,
+  EdgeInsetsGeometry? padding,
+  EdgeInsetsGeometry? margin,
+  Color? color,
+  BorderRadiusGeometry? radius,
+  BoxBorder? border,
+  List<BoxShadow>? shadow,
+  AlignmentGeometry? alignment,
+  Gradient? gradient,
+  BoxShape shape = BoxShape.rectangle,
+}) =>
+    Container(
+      key: key,
+      width: width,
+      height: height,
+      padding: padding,
+      margin: margin,
+      alignment: alignment,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: shape == BoxShape.circle ? null : radius,
+        border: border,
+        boxShadow: shadow,
+        gradient: gradient,
+        shape: shape,
+      ),
+      child: v,
+    );
+
 Widget debugBox(Widget v) => enableDebugBox
     ? Container(
         decoration: BoxDecoration(border: BoxBorder.all(color: debugColor)),
@@ -113,10 +153,12 @@ Widget debugBox(Widget v) => enableDebugBox
 
 Column column(
   List<Widget> c, {
+  Key? key,
   MainAxisAlignment ma = MainAxisAlignment.start,
   CrossAxisAlignment ca = CrossAxisAlignment.start,
   MainAxisSize ms = MainAxisSize.min,
 }) => Column(
+  key: key,
   mainAxisAlignment: ma,
   crossAxisAlignment: ca,
   mainAxisSize: ms,
@@ -125,18 +167,20 @@ Column column(
 
 Row row(
   List<Widget> c, {
+  Key? key,
   MainAxisAlignment ma = MainAxisAlignment.start,
   CrossAxisAlignment ca = CrossAxisAlignment.start,
   MainAxisSize ms = MainAxisSize.min,
 }) => Row(
+  key: key,
   mainAxisAlignment: ma,
   crossAxisAlignment: ca,
   mainAxisSize: ms,
   children: c,
 );
 
-Stack stack(List<Widget> c, {AlignmentGeometry a = Alignment.center}) =>
-    Stack(alignment: a, children: c);
+Stack stack(List<Widget> c, {Key? key, AlignmentGeometry a = Alignment.center}) =>
+    Stack(key: key, alignment: a, children: c);
 
 Positioned positioned(
   Widget c, {
@@ -207,7 +251,8 @@ Widget dot(Color c, double s) => Container(
   decoration: BoxDecoration(shape: BoxShape.circle, color: c),
 );
 
-Padding padding(EdgeInsets p, Widget c) => Padding(padding: p, child: c);
+Padding padding(EdgeInsets p, Widget c, {Key? key}) =>
+    Padding(key: key, padding: p, child: c);
 
 @Deprecated("some problem needed to be fix")
 Future<dynamic> pushScene(scene, ctx) =>

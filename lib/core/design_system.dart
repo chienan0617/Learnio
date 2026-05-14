@@ -73,6 +73,13 @@ TextStyle get tsBodyMedium => TextStyle(
       height: 1.5,
     );
 
+TextStyle get tsBodySmall => TextStyle(
+      fontSize: 12,
+      fontWeight: fw4,
+      color: tx6,
+      height: 1.5,
+    );
+
 TextStyle get tsCaption => TextStyle(
       fontSize: 12,
       fontWeight: fw5,

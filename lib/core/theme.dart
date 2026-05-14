@@ -8,8 +8,7 @@ class AppTheme {
   }
 }
 
-bool get darkMode =>true;
-    // Data.app.get("dark_mode", true); //; //AppTheme.data["dark_mode"] ?? false;
+bool get darkMode => Data.app.get("dark_mode", true);
 set darkMode(v) {
   Data.app.put("dark_mode", v);
 }
@@ -60,4 +59,4 @@ Color _c(String key) {
   return hexColor(hex);
 }
 
-Color primaryStyle = decideStyle(primary);
+Color get primaryStyle => decideStyle(primary);

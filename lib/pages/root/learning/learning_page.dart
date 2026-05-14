@@ -80,7 +80,7 @@ class _LearningPageState extends State<LearningPage> {
           decoration: InputDecoration(
             hintText: '搜尋學習筆記...',
             hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
-            prefixIcon: Icon(Icons.search_rounded, color: tx6, size: 20),
+            prefixIcon: Icon(Icons.search_outlined, color: tx6, size: 20),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),

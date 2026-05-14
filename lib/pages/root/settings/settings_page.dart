@@ -10,7 +10,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = darkMode;
   bool _hapticEnabled = true;
-  String _language = '繁體中文';
+  final String _language = '繁體中文';
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     value: _isDarkMode,
                     onChanged: (v) {
                       setState(() => _isDarkMode = v);
-                      // darkMode = v;
+                      darkMode = v;
+                      rebuild('main');
                     },
                   ),
                   _toggleTile(
@@ -109,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           IconButton(
             onPressed: () => Scaffold.of(context).openDrawer(),
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
+            icon: Icon(Icons.menu_outlined, color: tx1, size: 26),
           ),
           const SizedBox(width: DesignSystem.space8),
           Text('設定', style: tsTitleLarge.copyWith(fontSize: 24)),

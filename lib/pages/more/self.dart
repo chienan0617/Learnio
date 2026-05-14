@@ -11,7 +11,7 @@ class SelfPageNotEnable extends StatelessWidget {
         backgroundColor: bg1,
         elevation: 0,
         leading: iconButton(
-          icon(Icons.arrow_back_ios_new_rounded, 20, tx1),
+          icon(Icons.arrow_back_ios_new_outlined, 20, tx1),
           () => Navigator.pop(context),
         ),
         title: textD("更多功能", 18, fw7, tx1),
@@ -25,13 +25,13 @@ class SelfPageNotEnable extends StatelessWidget {
             _buildSectionTitle("數據與同步"),
             _buildMenuCard([
               _menuItem(
-                Icons.cloud_done_rounded,
+                Icons.cloud_done_outlined,
                 "雲端備份",
                 "最後同步：10分鐘前",
                 Colors.blue,
               ),
               _menuItem(
-                Icons.analytics_rounded,
+                Icons.analytics_outlined,
                 "生產力報告",
                 "查看您的任務完成趨勢",
                 Colors.orange,
@@ -39,9 +39,9 @@ class SelfPageNotEnable extends StatelessWidget {
             ]),
             _buildSectionTitle("工作空間"),
             _buildMenuCard([
-              _menuItem(Icons.archive_rounded, "檔案櫃", "已封存的筆記與清單", Colors.teal),
+              _menuItem(Icons.archive_outlined, "檔案櫃", "已封存的筆記與清單", Colors.teal),
               _menuItem(
-                Icons.delete_outline_rounded,
+                Icons.delete_outlined,
                 "回收站",
                 "最近刪除的項目",
                 Colors.redAccent,
@@ -50,13 +50,13 @@ class SelfPageNotEnable extends StatelessWidget {
             _buildSectionTitle("其他"),
             _buildMenuCard([
               _menuItem(
-                Icons.star_outline_rounded,
+                Icons.star_outlined,
                 "給個好評",
                 "支持我們的開發工作",
                 Colors.amber,
               ),
               _menuItem(
-                Icons.share_rounded,
+                Icons.share_outlined,
                 "分享給朋友",
                 "讓更多人體驗極簡效率",
                 Colors.indigo,
@@ -137,7 +137,7 @@ class SelfPageNotEnable extends StatelessWidget {
       ),
       title: textD(title, 16, fw6, tx1),
       subtitle: textD(subtitle, 12, fw4, tx2),
-      trailing: Icon(Icons.chevron_right_rounded, color: tx3, size: 20),
+      trailing: Icon(Icons.chevron_right_outlined, color: tx3, size: 20),
       onTap: () {},
     );
   }

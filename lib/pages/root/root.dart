@@ -79,9 +79,9 @@ class _RootPageState extends State<RootPage> {
         duration: DesignSystem.animNormal,
         switchInCurve: Curves.easeOut,
         switchOutCurve: Curves.easeIn,
-        child: Container(
+        child: container(
+          _buildCurrentPage(),
           key: ValueKey(_currentPage),
-          child: _buildCurrentPage(),
         ),
       ),
     );

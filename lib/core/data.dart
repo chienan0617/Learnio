@@ -1,11 +1,22 @@
 import 'package:learnio/base.dart';
+import 'package:learnio/script/controller/data/data_controller.dart';
+import 'package:learnio/script/types/chat_message.dart';
+import 'package:learnio/script/types/conversation.dart';
+import 'package:learnio/script/types/learning_item.dart';
+import 'package:learnio/script/types/project.dart';
+import 'package:learnio/script/types/deleted_item.dart';
+import 'package:learnio/script/types/trackable.dart';
 
 class Data {
   static final String databaseVersion = System.databaseVersion;
   static final app = Database('app');
   static final recycleBin = Database('recycle-bin');
 
-  static final List<Registerable> _dataList = [app, recycleBin];
+  static final List<Registerable> _dataList = [
+    app,
+    recycleBin,
+    ...DataController.registrables,
+  ];
 
   static String getDatabaseName(String boxName) {
     return Database.transferKey(
@@ -24,6 +35,29 @@ class Data {
   static void registerAdapter() {
     if (!Hive.isAdapterRegistered(200)) {
       Hive.registerAdapter(ColorAdapter());
+    }
+
+    // Register generated adapters
+    if (!Hive.isAdapterRegistered(48)) {
+      Hive.registerAdapter(TrackableDataAdapter());
+    }
+    if (!Hive.isAdapterRegistered(49)) {
+      Hive.registerAdapter(DeletedItemDataAdapter());
+    }
+    if (!Hive.isAdapterRegistered(50)) {
+      Hive.registerAdapter(MessageRoleAdapter());
+    }
+    if (!Hive.isAdapterRegistered(51)) {
+      Hive.registerAdapter(ChatMessageAdapter());
+    }
+    if (!Hive.isAdapterRegistered(52)) {
+      Hive.registerAdapter(ConversationAdapter());
+    }
+    if (!Hive.isAdapterRegistered(53)) {
+      Hive.registerAdapter(LearningItemAdapter());
+    }
+    if (!Hive.isAdapterRegistered(54)) {
+      Hive.registerAdapter(ProjectAdapter());
     }
   }
 }

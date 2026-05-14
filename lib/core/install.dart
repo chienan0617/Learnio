@@ -48,7 +48,7 @@ class DesktopInstallHelper {
                   text("安裝到桌面", 20, fw7, tx1, false, faSg),
                   spacer(),
                   // 這裡的 inkWell 需要 Material 祖先
-                  inkWell(icon(Icons.close, 20, tx3), () => popPage(ctx)),
+                  inkWell(icon(Icons.close_outlined, 20, tx3), () => popPage(ctx)),
                 ], ma: spB),
 
                 height(24),
@@ -94,7 +94,7 @@ class DesktopInstallHelper {
   ]);
 
   static Widget _buildIosChromeWarning() => column([
-    _buildStepIcon(Icons.warning_amber_rounded, CommonColors.error),
+    _buildStepIcon(Icons.warning_amber_outlined, CommonColors.error),
     height(16),
     center(text("請換用 Safari", 18, fw7, CommonColors.error)),
     height(8),
@@ -106,13 +106,13 @@ class DesktopInstallHelper {
     height(16),
     _guideStep("2", "點擊 '安裝應用程式'"),
     height(20),
-    _buildStepIcon(Icons.add_to_home_screen_rounded, CommonColors.accentTeal),
+    _buildStepIcon(Icons.add_to_home_screen_outlined, CommonColors.accentTeal),
   ]);
 
   static Widget _buildDefaultGuide() => column([
     center(text("點擊瀏覽器網址列右側的圖標即可安裝應用程式。", 14, fw4, tx2)),
     height(20),
-    _buildStepIcon(Icons.laptop_chromebook, CommonColors.info),
+    _buildStepIcon(Icons.laptop_chromebook_outlined, CommonColors.info),
   ]);
 
   static Widget _guideStep(String num, String desc) => row([

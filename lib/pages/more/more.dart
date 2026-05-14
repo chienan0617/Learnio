@@ -23,7 +23,7 @@ class _MorePageState extends State<MorePage> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: tx1, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_outlined, color: tx1, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -103,7 +103,7 @@ class _MorePageState extends State<MorePage> {
         children: [
           CircleAvatar(
             backgroundColor: primary.withOpacity(0.1),
-            child: Icon(Icons.devices_rounded, color: primary, size: 20),
+            child: Icon(Icons.devices_outlined, color: primary, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -180,7 +180,7 @@ class _MorePageState extends State<MorePage> {
               ),
             ),
             Icon(
-              Icons.open_in_new_rounded,
+              Icons.open_in_new_outlined,
               size: 18,
               color: tx3.withOpacity(0.5),
             ),

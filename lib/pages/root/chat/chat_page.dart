@@ -4,7 +4,6 @@ import 'package:learnio/script/controller/chat/conversation_controller.dart';
 import 'package:learnio/script/controller/chat/learning_controller.dart';
 import 'package:learnio/pages/root/chat/widgets/message_bubble.dart';
 import 'package:learnio/pages/root/chat/widgets/chat_input_bar.dart';
-import 'package:learnio/pages/root/chat/widgets/model_selector.dart';
 import 'package:learnio/pages/root/chat/widgets/typing_indicator.dart';
 
 class ChatPage extends StatefulWidget {
@@ -60,34 +59,30 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // 頂部欄
-        _buildTopBar(context),
+    return column([
+      // 頂部欄
+      _buildTopBar(context),
 
-        // 訊息列表
-        Expanded(
-          child: _chat.messages.isEmpty
-              ? _buildEmptyState()
-              : _buildMessageList(),
-        ),
+      // 訊息列表
+      expand(
+        _chat.messages.isEmpty ? _buildEmptyState() : _buildMessageList(),
+      ),
 
-        // 輸入區
-        ChatInputBar(
-          chatController: _chat,
-          onSend: (content) => _chat.sendMessage(content),
-          onVoicePressed: () {
-            // TODO: 語音輸入
-          },
-          onFilesSelected: (files) {
-            // TODO: 處理選擇的文件
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('已選擇 ${files.length} 個檔案')),
-            );
-          },
-        ),
-      ],
-    );
+      // 輸入區
+      ChatInputBar(
+        chatController: _chat,
+        onSend: (content) => _chat.sendMessage(content),
+        onVoicePressed: () {
+          // TODO: 語音輸入
+        },
+        onFilesSelected: (files) {
+          // TODO: 處理選擇的文件
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: text('已選擇 ${files.length} 個檔案')));
+        },
+      ),
+    ], ms: MainAxisSize.max);
   }
 
   Widget _buildTopBar(BuildContext context) {
@@ -104,40 +99,50 @@ class _ChatPageState extends State<ChatPage> {
           bottom: BorderSide(color: bg3.withOpacity(0.2), width: 0.5),
         ),
       ),
-      child: Row(
-        children: [
-          // 漢堡選單
-          IconButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              Scaffold.of(context).openDrawer();
-            },
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
-          ),
+      child: row([
+        // 漢堡選單
+        iconButton(
+          icon(Icons.menu_outlined, 26),
+          () {
+            HapticFeedback.lightImpact();
+            Scaffold.of(context).openDrawer();
+          },
+        ),
 
-          const Spacer(),
-
-          // 新對話
-          IconButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _conv.startNewConversation();
-              setState(() {});
-            },
-            icon: Icon(Icons.edit_square, color: tx1, size: 24),
+        expand(
+          text(
+            _chat.current?.title ?? 'Learnio',
+            18,
+            fw6,
+            tx1,
+            false,
+            null,
+            fsN,
+            TextAlign.center,
+            1,
+            TextOverflow.ellipsis,
           ),
-        ],
-      ),
+        ),
+
+        // 新對話
+        iconButton(
+          icon(Icons.add_comment_outlined, 24),
+          () {
+            HapticFeedback.lightImpact();
+            _conv.startNewConversation();
+            setState(() {});
+          },
+        ),
+      ]),
     );
   }
 
   Widget _buildEmptyState() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: DesignSystem.space32, vertical: 64),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return scroll(
+      padding(
+        symmetric(DesignSystem.space32, 64),
+        column(
+          [
             // AI Logo
             Container(
               width: 80,
@@ -157,29 +162,36 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.auto_awesome,
-                size: 40,
-                color: Colors.white,
-              ),
+              child: icon(Icons.auto_awesome_outlined, 40, Colors.white),
             ),
-            const SizedBox(height: DesignSystem.space32),
-            Text(
+            height(DesignSystem.space32),
+            text(
               '有什麼想學的嗎？',
-              style: tsDisplay.copyWith(fontSize: 24),
-              textAlign: TextAlign.center,
+              24,
+              fw8,
+              tx1,
+              false,
+              null,
+              fsN,
+              TextAlign.center,
             ),
-            const SizedBox(height: DesignSystem.space12),
-            Text(
+            height(DesignSystem.space12),
+            text(
               '我是 Learnio，你的 AI 學習助手\n我可以幫你整理知識、回答問題或制定學習計劃',
-              style: tsBodyMedium.copyWith(color: tx6),
-              textAlign: TextAlign.center,
+              14,
+              fw4,
+              tx6,
+              false,
+              null,
+              fsN,
+              TextAlign.center,
             ),
-            const SizedBox(height: DesignSystem.space32),
+            height(DesignSystem.space32),
 
             // 建議問題
             ..._buildSuggestions(),
           ],
+          ca: CrossAxisAlignment.center,
         ),
       ),
     );
@@ -194,38 +206,37 @@ class _ChatPageState extends State<ChatPage> {
     ];
 
     return suggestions.map((s) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: DesignSystem.space12),
-        child: InkWell(
-          onTap: () {
+      return padding(
+        const EdgeInsets.only(bottom: DesignSystem.space12),
+        inkWell(
+          container(
+            row([
+              text(s.$1, 20),
+              width(DesignSystem.space16),
+              expand(
+                text(
+                  s.$2,
+                  14,
+                  fw5,
+                  tx1,
+                ),
+              ),
+              icon(
+                Icons.arrow_forward_ios_rounded,
+                14,
+                tx6.withOpacity(0.4),
+              ),
+            ]),
+            width: double.infinity,
+            padding: symmetric(DesignSystem.space20, DesignSystem.space16),
+            color: bg2,
+            radius: DesignSystem.borderM,
+            border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
+          ),
+          () {
             HapticFeedback.lightImpact();
             _chat.sendMessage(s.$2);
           },
-          borderRadius: DesignSystem.borderM,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-                horizontal: DesignSystem.space20, vertical: DesignSystem.space16),
-            decoration: BoxDecoration(
-              color: bg2,
-              borderRadius: DesignSystem.borderM,
-              border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
-            ),
-            child: Row(
-              children: [
-                Text(s.$1, style: const TextStyle(fontSize: 20)),
-                const SizedBox(width: DesignSystem.space16),
-                Expanded(
-                  child: Text(
-                    s.$2,
-                    style: tsBodyMedium.copyWith(color: tx1, fontWeight: fw5),
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios_rounded,
-                    size: 14, color: tx6.withOpacity(0.4)),
-              ],
-            ),
-          ),
         ),
       );
     }).toList();
@@ -259,7 +270,12 @@ class _ChatPageState extends State<ChatPage> {
             );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('已儲存到學習庫', style: tsBodyMedium.copyWith(color: Colors.white)),
+                content: text(
+                  '已儲存到學習庫',
+                  14,
+                  fw4,
+                  Colors.white,
+                ),
                 backgroundColor: bg4,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(seconds: 2),

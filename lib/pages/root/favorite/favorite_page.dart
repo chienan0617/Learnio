@@ -56,7 +56,7 @@ class _FavoritePageState extends State<FavoritePage> {
               HapticFeedback.lightImpact();
               Scaffold.of(context).openDrawer();
             },
-            icon: Icon(Icons.menu_rounded, color: tx1, size: 26),
+            icon: Icon(Icons.menu_outlined, color: tx1, size: 26),
           ),
           const SizedBox(width: DesignSystem.space8),
           Text('收藏', style: tsTitleLarge.copyWith(fontSize: 24)),

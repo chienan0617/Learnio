@@ -17,7 +17,7 @@ class _ErrorPageState extends State<ErrorPage> {
         backgroundColor: bg1,
         elevation: 0,
         leading: iconButton(
-          icon(Icons.arrow_back_ios_new, 24, tx1),
+          icon(Icons.arrow_back_ios_new_outlined, 24, tx1),
           () => popPage(context),
         ),
         title: text("錯誤", 24, fw8, tx1),

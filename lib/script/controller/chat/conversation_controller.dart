@@ -1,3 +1,4 @@
+import 'package:learnio/script/controller/data/data_controller.dart';
 import 'package:learnio/script/types/chat_message.dart';
 import 'package:learnio/script/types/conversation.dart';
 
@@ -10,7 +11,17 @@ class ConversationController {
   Conversation? get current => _current;
 
   ConversationController() {
-    _loadMockData();
+    _loadFromStorage();
+  }
+
+  void _loadFromStorage() {
+    final stored = DataController.getConversations();
+    if (stored.isEmpty) {
+      _loadMockData();
+    } else {
+      _conversations.addAll(stored);
+      _conversations.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    }
   }
 
   Conversation createConversation({String title = '新對話'}) {
@@ -22,8 +33,23 @@ class ConversationController {
     );
     _conversations.insert(0, conv);
     _current = conv;
+    DataController.saveConversation(conv);
     onStateChanged?.call();
     return conv;
+  }
+
+  void renameConversation(String id, String newTitle) {
+    final index = _conversations.indexWhere((c) => c.id == id);
+    if (index != -1) {
+      _conversations[index].title = newTitle;
+      updateConversation(_conversations[index]);
+    }
+  }
+
+  void updateConversation(Conversation conversation) {
+    conversation.updatedAt = DateTime.now();
+    DataController.saveConversation(conversation);
+    onStateChanged?.call();
   }
 
   void selectConversation(String id) {
@@ -37,6 +63,7 @@ class ConversationController {
 
   void deleteConversation(String id) {
     _conversations.removeWhere((c) => c.id == id);
+    DataController.deleteConversation(id);
     if (_current?.id == id) {
       _current = _conversations.isNotEmpty ? _conversations.first : null;
     }
@@ -117,79 +144,10 @@ class ConversationController {
       ),
     ]);
 
-    // 對話 3
-    final conv3 = Conversation(
-      id: 'conv_mock_3',
-      title: '機器學習入門路線圖',
-      createdAt: now.subtract(const Duration(days: 3)),
-      updatedAt: now.subtract(const Duration(days: 3)),
-      modelName: 'GPT-4o',
-    );
-    conv3.messages.addAll([
-      ChatMessage(
-        id: 'msg_m5',
-        conversationId: conv3.id,
-        role: MessageRole.user,
-        content: '我想學機器學習，應該從哪裡開始？',
-        timestamp: now.subtract(const Duration(days: 3)),
-      ),
-      ChatMessage(
-        id: 'msg_m6',
-        conversationId: conv3.id,
-        role: MessageRole.assistant,
-        content: '## 機器學習入門路線圖\n\n'
-            '### 第一階段：數學基礎（2-4 週）\n'
-            '- 線性代數基礎\n'
-            '- 機率與統計\n'
-            '- 微積分基礎\n\n'
-            '### 第二階段：Python 程式設計（2-3 週）\n'
-            '- NumPy, Pandas\n'
-            '- Matplotlib 視覺化\n\n'
-            '### 第三階段：ML 核心概念（4-6 週）\n'
-            '- 監督式學習\n'
-            '- 非監督式學習\n'
-            '- scikit-learn 實作\n\n'
-            '### 第四階段：深度學習（4-8 週）\n'
-            '- 神經網路基礎\n'
-            '- TensorFlow / PyTorch\n\n'
-            '建議從 Andrew Ng 的課程開始！🚀',
-        timestamp: now.subtract(const Duration(days: 3)),
-        isFavorite: true,
-      ),
-    ]);
-
-    // 對話 4
-    final conv4 = Conversation(
-      id: 'conv_mock_4',
-      title: '設計模式：觀察者模式',
-      createdAt: now.subtract(const Duration(days: 5)),
-      updatedAt: now.subtract(const Duration(days: 5)),
-    );
-    conv4.messages.addAll([
-      ChatMessage(
-        id: 'msg_m7',
-        conversationId: conv4.id,
-        role: MessageRole.user,
-        content: '什麼是觀察者模式？可以給一個實際例子嗎？',
-        timestamp: now.subtract(const Duration(days: 5)),
-      ),
-      ChatMessage(
-        id: 'msg_m8',
-        conversationId: conv4.id,
-        role: MessageRole.assistant,
-        content: '## 觀察者模式 (Observer Pattern)\n\n'
-            '觀察者模式定義了一種一對多的依賴關係，讓多個觀察者同時監聽一個主題。'
-            '當主題狀態改變時，所有觀察者都會收到通知。\n\n'
-            '**實際例子：** YouTube 訂閱\n'
-            '- 頻道 = Subject（主題）\n'
-            '- 訂閱者 = Observer（觀察者）\n'
-            '- 發布影片 = 狀態改變 → 通知所有訂閱者\n\n'
-            '這個模式在 Flutter 中非常常見，例如 `ChangeNotifier`。',
-        timestamp: now.subtract(const Duration(days: 5)),
-        isFavorite: true,
-      ),
-    ]);
-
-    _conversations.addAll([conv1, conv2, conv3, conv4]);
+    final mockData = [conv1, conv2];
+    _conversations.addAll(mockData);
+    for (var c in mockData) {
+      DataController.saveConversation(c);
+    }
   }
 }

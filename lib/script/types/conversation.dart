@@ -1,12 +1,29 @@
+import 'package:learnio/base.dart';
 import 'package:learnio/script/types/chat_message.dart';
 
+part 'conversation.g.dart';
+
+@HiveType(typeId: 52)
 class Conversation {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   String title;
+
+  @HiveField(2)
   final List<ChatMessage> messages;
+
+  @HiveField(3)
   final DateTime createdAt;
+
+  @HiveField(4)
   DateTime updatedAt;
+
+  @HiveField(5)
   String modelName;
+
+  @HiveField(6)
   String? projectId;
 
   Conversation({
