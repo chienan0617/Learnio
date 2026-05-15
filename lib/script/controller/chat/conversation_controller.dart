@@ -79,6 +79,7 @@ class ConversationController {
       orElse: () => _conversations.first,
     );
     _current = conv;
+    _isIncognito = false; // Turn off incognito when selecting a normal conversation
     onStateChanged?.call();
   }
 

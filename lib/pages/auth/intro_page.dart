@@ -17,7 +17,7 @@ class _IntroPageState extends State<IntroPage> {
       "title": "Learnio AI",
       "subtitle": "你的個人化學習伴侶",
       "desc": "透過與 AI 對話，以專案化的方式掌握任何領域的知識。",
-      "icon": Icons.auto_awesome_rounded,
+      "icon": logo(80, primary),
       "color": primary,
     },
     {
@@ -62,7 +62,9 @@ class _IntroPageState extends State<IntroPage> {
       column([
         center(
           container(
-            center(icon(data['icon'], 80, data['color'])),
+            center(data['icon'] is IconData
+                ? icon(data['icon'], 80, data['color'])
+                : data['icon']),
             width: 180,
             height: 180,
             radius: DesignSystem.borderXL,

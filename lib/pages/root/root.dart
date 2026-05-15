@@ -54,11 +54,13 @@ class _RootPageState extends State<RootPage> {
 
   void _selectConversation(String conversationId) {
     _convController.selectConversation(conversationId);
+    _chatController.syncSelectedModel();
     setState(() => _currentPage = 'chat');
   }
 
   void _startNewConversation() {
     _convController.startNewConversation();
+    _chatController.syncSelectedModel();
     setState(() => _currentPage = 'chat');
   }
 

@@ -1,7 +1,11 @@
+import 'package:learnio/core/debug.dart';
 import 'package:learnio/script/types/chat_message.dart';
 import 'package:learnio/script/types/conversation.dart';
+import 'package:learnio/script/types/ai_model.dart';
 import 'package:learnio/script/controller/chat/conversation_controller.dart';
 import 'package:learnio/script/controller/service/chat_api_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 typedef VoidCallbackSimple = void Function();
 
@@ -10,7 +14,9 @@ class ChatController {
   final ChatApiService _chatApiService = ChatApiService();
   VoidCallbackSimple? onStateChanged;
 
-  ChatController(this._conversationController);
+  ChatController(this._conversationController) {
+    fetchModels();
+  }
 
   Conversation? get current => _conversationController.current;
   List<ChatMessage> get messages => current?.messages ?? [];
@@ -18,25 +24,84 @@ class ChatController {
 
   bool _isGenerating = false;
   bool get isGenerating => _isGenerating;
+  bool _isStopping = false;
 
   /// Returns true only when the AI is processing but hasn't started outputting text.
   bool get isThinking => _isGenerating && (messages.isEmpty || messages.last.role != MessageRole.assistant || messages.last.content.isEmpty);
 
-  String _selectedModel = 'Gemini 2.5 Pro';
-  String get selectedModel => _selectedModel;
-  static const List<String> availableModels = [
-    'Gemini 2.5 Pro',
-    'Gemini 2.5 Flash',
-    'GPT-4o',
-    'Claude Sonnet',
-  ];
+  AiModel? _selectedModelObj;
+  String get selectedModel => _selectedModelObj?.name ?? 'Gemini 2.5 Pro';
+  AiModel? get selectedModelObj => _selectedModelObj;
 
-  void selectModel(String model) {
-    _selectedModel = model;
+  List<AiModel> _availableModels = [];
+  List<AiModel> get availableModels => _availableModels;
+
+  bool _isLoadingModels = false;
+  bool get isLoadingModels => _isLoadingModels;
+
+  Future<void> fetchModels() async {
+    _isLoadingModels = true;
+    onStateChanged?.call();
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://chienan0617.github.io/layout/dev.cas.learnio/models/models_list.json'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        _availableModels = data
+            .map((json) => AiModel.fromJson(json))
+            .where((m) => m.enable)
+            .toList();
+
+        // 設置初始選中模型
+        if (_availableModels.isNotEmpty) {
+          // 優先匹配當前對話的模型
+          if (current != null) {
+            _selectedModelObj = _availableModels.firstWhere(
+              (m) => m.id == current!.modelName || m.name == current!.modelName,
+              orElse: () => _availableModels.first,
+            );
+          } else {
+            _selectedModelObj = _availableModels.first;
+          }
+        }
+      }
+    } catch (e) {
+      logE('Failed to fetch models: $e');
+    } finally {
+      _isLoadingModels = false;
+      onStateChanged?.call();
+    }
+  }
+
+  void selectModel(AiModel model) {
+    _selectedModelObj = model;
     if (current != null) {
-      current!.modelName = model;
+      current!.modelName = model.id;
     }
     onStateChanged?.call();
+  }
+
+  /// 同步選中的模型物件與當前對話的模型名稱
+  void syncSelectedModel() {
+    if (_availableModels.isEmpty) return;
+
+    if (current != null) {
+      _selectedModelObj = _availableModels.firstWhere(
+        (m) => m.id == current!.modelName || m.name == current!.modelName,
+        orElse: () => _availableModels.first,
+      );
+    } else {
+      _selectedModelObj = _availableModels.first;
+    }
+    onStateChanged?.call();
+  }
+
+  void stopGeneration() {
+    if (_isGenerating) {
+      _isStopping = true;
+      onStateChanged?.call();
+    }
   }
 
   Future<void> sendMessage(String content, {List<String>? images, List<String>? files, List<String>? links}) async {
@@ -47,6 +112,10 @@ class ChatController {
       _conversationController.createConversation(
         title: content.length > 30 ? '${content.substring(0, 30)}...' : content,
       );
+      // Ensure the model is set for the new conversation
+      if (_selectedModelObj != null) {
+        current!.modelName = _selectedModelObj!.id;
+      }
     }
 
     final userMsg = ChatMessage(
@@ -71,6 +140,7 @@ class ChatController {
     }
 
     _isGenerating = true;
+    _isStopping = false;
     onStateChanged?.call();
 
     // 呼叫真實 API 回應
@@ -88,6 +158,7 @@ class ChatController {
     current!.messages.removeAt(idx);
     
     _isGenerating = true;
+    _isStopping = false;
     onStateChanged?.call();
 
     // Re-fetch response
@@ -107,12 +178,24 @@ class ChatController {
     current!.messages.add(aiMsg);
 
     try {
-      final stream = _chatApiService.getChatStream(current!, images: images, files: files, links: links);
+      final stream = _chatApiService.getChatStream(
+        current!,
+        gateway: _selectedModelObj?.gateway,
+      );
 
       String fullContent = '';
       bool hasReceivedData = false;
 
       await for (final chunk in stream) {
+        if (_isStopping) {
+          fullContent += '\n\n*(已終止對話)*';
+          final idx = current!.messages.indexWhere((m) => m.id == aiMsgId);
+          if (idx != -1) {
+            current!.messages[idx] = aiMsg.copyWith(content: fullContent);
+          }
+          break;
+        }
+
         if (chunk.startsWith('Error:')) {
           throw Exception(chunk.replaceFirst('Error:', '').trim());
         }
@@ -129,20 +212,23 @@ class ChatController {
         onStateChanged?.call();
       }
 
-      if (!hasReceivedData) {
+      if (!hasReceivedData && !_isStopping) {
         throw Exception('未收到來自伺服器的回應');
       }
     } catch (e) {
-      final idx = current!.messages.indexWhere((m) => m.id == aiMsgId);
-      if (idx != -1) {
-        current!.messages[idx] = aiMsg.copyWith(
-          content: '抱歉，處理您的請求時發生錯誤。\n\n詳細資訊：$e',
-          isError: true,
-        );
+      if (!_isStopping) {
+        final idx = current!.messages.indexWhere((m) => m.id == aiMsgId);
+        if (idx != -1) {
+          current!.messages[idx] = aiMsg.copyWith(
+            content: '抱歉，處理您的請求時發生錯誤。\n\n詳細資訊：$e',
+            isError: true,
+          );
+        }
       }
     } finally {
       current!.updatedAt = DateTime.now();
       _isGenerating = false;
+      _isStopping = false;
       onStateChanged?.call();
     }
   }

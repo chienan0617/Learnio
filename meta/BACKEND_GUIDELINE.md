@@ -53,7 +53,9 @@ data: {
 **前端輸入**:
 ```json
 {
-  "messages": [{"role": "user", "content": "你好", "images": ["base64..."]}]
+  "messages": [{"role": "user", "content": "你好", "images": ["base64..."]}],
+  "model": "gemini-3.1-flash-lite-preview",
+  "gateway": "google-ai-studio"
 }
 ```
 **後端轉化後傳給 LLM**:

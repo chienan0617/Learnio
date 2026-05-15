@@ -80,7 +80,9 @@ class _TutorialIntroductionPageState extends State<TutorialIntroductionPage>
                 //   right: -20, top: -20,
                 //   child: CircleAvatar(radius: 40, backgroundColor: (item['accent'] as Color).withOpacity(0.1)),
                 // ),
-                center(icon(item['icon'], 80, item['accent'])),
+                center(item['icon'] is IconData
+                    ? icon(item['icon'], 80, item['accent'])
+                    : item['icon']),
               ],
             ),
             width: 200,

@@ -8,18 +8,19 @@ class ChatApiService {
   final ApiServiceController _apiController = ApiServiceController();
 
   /// Streams the response for a given conversation.
-  Stream<String> getChatStream(Conversation conversation, {List<String>? images, List<String>? files, List<String>? links}) {
+  Stream<String> getChatStream(Conversation conversation, {String? gateway}) {
     final messages = conversation.messages.map((m) => {
       'role': _mapRole(m.role),
       'content': m.content,
+      if (m.images != null && m.images!.isNotEmpty) 'images': m.images,
+      if (m.files != null && m.files!.isNotEmpty) 'files': m.files,
+      if (m.links != null && m.links!.isNotEmpty) 'links': m.links,
     }).toList();
 
     return _apiController.streamChat(
       messages: messages,
       model: conversation.modelName,
-      images: images,
-      files: files,
-      links: links,
+      gateway: gateway,
     );
   }
 

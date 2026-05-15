@@ -56,47 +56,64 @@ class ModelSelector extends StatelessWidget {
               const EdgeInsets.all(DesignSystem.space24),
               text('選擇模型', 16, fw6),
             ),
-            ...ChatController.availableModels.map((model) {
-              final isSelected = model == chatController.selectedModel;
-              return ListTile(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  chatController.selectModel(model);
-                  onChanged();
-                  Navigator.pop(ctx);
-                },
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: DesignSystem.space24,
-                  vertical: DesignSystem.space4,
+            if (chatController.isLoadingModels)
+              padding(
+                const EdgeInsets.symmetric(horizontal: DesignSystem.space24),
+                const LinearProgressIndicator(
+                  minHeight: 2,
+                  backgroundColor: Colors.transparent,
                 ),
-                leading: container(
-                  logo(20, isSelected ? Colors.white : tx6),
-                  width: 40,
-                  height: 40,
-                  gradient: isSelected
-                      ? LinearGradient(
-                          colors: [primary, secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
+              ),
+            if (chatController.isLoadingModels)
+              ...List.generate(3, (index) => _buildSkeletonItem(context))
+            else
+              ...chatController.availableModels.map((model) {
+                final isSelected = model.name == chatController.selectedModel;
+                return ListTile(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    chatController.selectModel(model);
+                    onChanged();
+                    Navigator.pop(ctx);
+                  },
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: DesignSystem.space24,
+                    vertical: DesignSystem.space8,
+                  ),
+                  leading: container(
+                    logo(20, isSelected ? Colors.white : tx6),
+                    width: 40,
+                    height: 40,
+                    gradient: isSelected
+                        ? LinearGradient(
+                            colors: [primary, secondary],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: isSelected ? null : bg3.withOpacity(0.5),
+                    radius: DesignSystem.borderM,
+                  ),
+                  title: text(
+                    model.name,
+                    14,
+                    isSelected ? fw7 : fw4,
+                    isSelected ? tx1 : tx2,
+                  ),
+                  subtitle: text(
+                    model.desc,
+                    12,
+                    fw4,
+                    tx6,
+                  ),
+                  trailing: isSelected
+                      ? icon(Icons.check_circle_rounded, 22, primary)
                       : null,
-                  color: isSelected ? null : bg3.withOpacity(0.5),
-                  radius: DesignSystem.borderM,
-                ),
-                title: text(
-                  model,
-                  14,
-                  isSelected ? fw7 : fw4,
-                  isSelected ? tx1 : tx2,
-                ),
-                trailing: isSelected
-                    ? icon(Icons.check_circle_rounded, 22, primary)
-                    : null,
-                shape: RoundedRectangleBorder(
-                  borderRadius: DesignSystem.borderM,
-                ),
-              );
-            }),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: DesignSystem.borderM,
+                  ),
+                );
+              }),
             height(DesignSystem.space24),
           ]),
         ),
@@ -105,6 +122,44 @@ class ModelSelector extends StatelessWidget {
           top: Radius.circular(DesignSystem.radiusXL),
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonItem(BuildContext context) {
+    return padding(
+      const EdgeInsets.symmetric(
+        horizontal: DesignSystem.space24,
+        vertical: DesignSystem.space12,
+      ),
+      row([
+        container(
+          box(),
+          width: 40,
+          height: 40,
+          color: bg3.withOpacity(0.3),
+          radius: DesignSystem.borderM,
+        ),
+        width(DesignSystem.space12),
+        expand(
+          column([
+            container(
+              box(),
+              width: 100,
+              height: 14,
+              color: bg3.withOpacity(0.3),
+              radius: DesignSystem.borderS,
+            ),
+            height(DesignSystem.space8),
+            container(
+              box(),
+              width: double.infinity,
+              height: 12,
+              color: bg3.withOpacity(0.2),
+              radius: DesignSystem.borderS,
+            ),
+          ], ca: CrossAxisAlignment.start),
+        ),
+      ]),
     );
   }
 }

@@ -78,15 +78,28 @@ SingleChildScrollView scroll(Widget v, [ScrollPhysics? p]) =>
 Icon icon(IconData icon, [double size = 20, Color? color, FontWeight? fw]) =>
     Icon(icon, size: size, color: color ?? tx1, fontWeight: fw);
 
-Widget logo([double size = 20, Color? color]) => Image.asset(
-      'assets/icon/icon.webp',
-      width: size,
-      height: size,
-      color: color,
-    );
+Widget logo([double size = 20, Color? color]) => true
+    ? Icon(Icons.auto_awesome, size: size, color: color)
+    : Image.asset(
+        'assets/icon/icon.webp',
+        width: size,
+        height: size,
+        color: color,
+      );
 
-IconButton iconButton(Icon icon, [fn, Color? color, double? size]) =>
-    IconButton(onPressed: fn, icon: icon, color: color, iconSize: size);
+IconButton iconButton(
+  Widget icon,
+  VoidCallback? fn, {
+  Color? color,
+  double? size,
+  Key? key,
+}) => IconButton(
+  key: key,
+  onPressed: fn,
+  icon: icon,
+  color: color,
+  iconSize: size,
+);
 
 // Widget liquidGlass(
 //   Widget c, {
@@ -141,26 +154,25 @@ Widget container(
   DecorationImage? image,
   BoxShape shape = BoxShape.rectangle,
   Clip clip = Clip.none,
-}) =>
-    Container(
-      key: key,
-      width: width,
-      height: height,
-      padding: padding,
-      margin: margin,
-      alignment: alignment,
-      clipBehavior: clip,
-      decoration: BoxDecoration(
-        color: color,
-        image: image,
-        borderRadius: shape == BoxShape.circle ? null : radius,
-        border: border,
-        boxShadow: shadow,
-        gradient: gradient,
-        shape: shape,
-      ),
-      child: v,
-    );
+}) => Container(
+  key: key,
+  width: width,
+  height: height,
+  padding: padding,
+  margin: margin,
+  alignment: alignment,
+  clipBehavior: clip,
+  decoration: BoxDecoration(
+    color: color,
+    image: image,
+    borderRadius: shape == BoxShape.circle ? null : radius,
+    border: border,
+    boxShadow: shadow,
+    gradient: gradient,
+    shape: shape,
+  ),
+  child: v,
+);
 
 Widget debugBox(Widget v) => enableDebugBox
     ? Container(
@@ -197,8 +209,11 @@ Row row(
   children: c,
 );
 
-Stack stack(List<Widget> c, {Key? key, AlignmentGeometry a = Alignment.center}) =>
-    Stack(key: key, alignment: a, children: c);
+Stack stack(
+  List<Widget> c, {
+  Key? key,
+  AlignmentGeometry a = Alignment.center,
+}) => Stack(key: key, alignment: a, children: c);
 
 Positioned positioned(
   Widget c, {

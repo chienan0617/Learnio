@@ -11,7 +11,7 @@ mixin TutorialPageIntroductionCtrler {
       {
         "title": "歡迎來到 Learnio",
         "desc": "你的個人 AI 學習助手，幫助你更高效地掌握知識。",
-        "icon": Icons.auto_awesome_outlined,
+        "icon": logo(80, primary),
         "accent": primary,
       },
       {

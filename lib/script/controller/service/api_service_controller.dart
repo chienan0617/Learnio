@@ -13,13 +13,19 @@ class ApiServiceController {
   Stream<String> streamChat({
     required List<Map<String, dynamic>> messages,
     String? model,
+    String? gateway,
     List<String>? images,
     List<String>? files,
     List<String>? links,
   }) async* {
     final filteredMessages = messages.where((msg) {
       final content = msg['content'];
-      return content != null && content.toString().trim().isNotEmpty;
+      final hasContent = content != null && content.toString().trim().isNotEmpty;
+      final hasImages = msg['images'] != null && (msg['images'] as List).isNotEmpty;
+      final hasFiles = msg['files'] != null && (msg['files'] as List).isNotEmpty;
+      final hasLinks = msg['links'] != null && (msg['links'] as List).isNotEmpty;
+      
+      return hasContent || hasImages || hasFiles || hasLinks;
     }).toList();
 
     logE(filteredMessages); // 確認過濾後的結果
@@ -32,6 +38,7 @@ class ApiServiceController {
       final body = {
         'messages': filteredMessages, // 🛠️ 2. 改用過濾後的訊息
         if (model != null) 'model': model,
+        if (gateway != null) 'gateway': gateway,
         if (images != null && images.isNotEmpty) 'images': images,
         if (files != null && files.isNotEmpty) 'files': files,
         if (links != null && links.isNotEmpty) 'links': links,
@@ -84,7 +91,7 @@ class ApiServiceController {
                 // unless it's the last part which might be incomplete
                 if (i == jsonParts.length - 1 && !part.endsWith('}')) {
                   // Put it back in buffer for next chunk
-                  buffer = part + (buffer.isEmpty ? "" : "\n" + buffer);
+                  buffer = part + (buffer.isEmpty ? "" : "\n$buffer");
                 }
               }
             }

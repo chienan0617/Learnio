@@ -64,8 +64,10 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   Future<void> _handleSend() async {
     final text = _textController.text.trim();
-    if (text.isEmpty && _selectedFiles.isEmpty && _selectedLinks.isEmpty)
+    if (text.isEmpty && _selectedFiles.isEmpty && _selectedLinks.isEmpty) {
       return;
+    }
+
 
     HapticFeedback.mediumImpact();
 
@@ -156,8 +158,9 @@ class _ChatInputBarState extends State<ChatInputBar> {
               allowMultiple: true,
               withData: true,
             );
-            if (result != null)
+            if (result != null) {
               setState(() => _selectedFiles.addAll(result.files));
+            }
           }),
           _attachmentOption(
             Icons.insert_drive_file_outlined,
@@ -324,15 +327,17 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
                 const Spacer(),
 
-                // 語音按鈕 / 送出按鈕
+                // 語音按鈕 / 送出按鈕 / 終止按鈕
                 AnimatedSwitcher(
                   duration: DesignSystem.animFast,
                   transitionBuilder: (child, anim) {
                     return ScaleTransition(scale: anim, child: child);
                   },
-                  child: (_hasText || _selectedFiles.isNotEmpty)
-                      ? _buildSendButton()
-                      : _buildVoiceButton(),
+                  child: widget.chatController.isGenerating
+                      ? _buildStopButton()
+                      : (_hasText || _selectedFiles.isNotEmpty)
+                          ? _buildSendButton()
+                          : _buildVoiceButton(),
                 ),
               ]),
             ),
@@ -519,10 +524,40 @@ class _ChatInputBarState extends State<ChatInputBar> {
     );
   }
 
+  Widget _buildStopButton() {
+    return container(
+      iconButton(
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        () => widget.chatController.stopGeneration(),
+      ),
+      key: const ValueKey('stop'),
+      color: tx1,
+      radius: DesignSystem.borderL,
+      shadow: [
+        BoxShadow(
+          color: tx1.withOpacity(0.2),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
   Widget _buildVoiceButton() {
-    return iconButton(icon(Icons.mic_outlined, 24, tx6), () {
-      HapticFeedback.lightImpact();
-      widget.onVoicePressed?.call();
-    });
+    return iconButton(
+      icon(Icons.mic_outlined, 24, tx6),
+      () {
+        HapticFeedback.lightImpact();
+        widget.onVoicePressed?.call();
+      },
+      key: const ValueKey('voice'),
+    );
   }
 }
