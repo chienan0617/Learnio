@@ -7,5 +7,7 @@
 ^ I want my app bar bg color as same as the conversation bg color.
 ^ My entire app 內文字體大小 is too small, try add 1 or 2 unit to suitable the size.
 ^ the stop and send button is too large and the color is not fit entire app style, try redesign it.
-* write me a DATA_STRUCTURE.md in @meta in chinese, Let me figure out the way this app stored data.
-* add library: string_to_icon, and add core file icons.dart in @lib/core to manage icons
+^ write me a DATA_STRUCTURE.md in @meta in chinese, Let me figure out the way this app stored data.
+^ add library: string_to_icon, and add core file icons.dart in @lib/core to manage icons
+* add bottom title warning that ai can make mistake slogan, like gemini and chatgpt
+* if input bar area content photo, top does't have padding help me add padding when photos contain

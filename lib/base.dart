@@ -11,6 +11,7 @@ export 'package:flutter/src/foundation/constants.dart';
 export 'package:hive_ce/hive.dart';
 export 'package:hive_ce_flutter/adapters.dart';
 export 'package:http/http.dart';
+export 'package:shimmer/shimmer.dart';
 
 // export 'package:flame/flame.dart';
 // export 'package:flame/game.dart' hide Matrix4, OverlayRoute, Route;

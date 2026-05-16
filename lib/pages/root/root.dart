@@ -12,7 +12,6 @@ import 'package:learnio/pages/root/favorite/favorite_page.dart';
 import 'package:learnio/pages/root/learning/learning_page.dart';
 import 'package:learnio/pages/root/settings/settings_page.dart';
 import 'package:learnio/pages/root/user/user_info_page.dart';
-import 'dart:ui' as ui;
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});

@@ -1,6 +1,7 @@
 import 'package:learnio/base.dart';
 import 'package:learnio/script/controller/chat/chat_controller.dart';
 import 'package:learnio/script/controller/chat/conversation_controller.dart';
+import 'package:http/http.dart' as http;
 
 class ChatCommand {
   final String name;
@@ -17,34 +18,37 @@ class ChatCommand {
 }
 
 class CommandController {
+  static const String _commandsUrl = 'https://chienan0617.github.io/layout/dev.cas.learnio/commands/commands_list.json';
+  static List<ChatCommand> _remoteCommands = [];
+  static bool _hasFetched = false;
+
   static List<ChatCommand> getCommands() {
-    return [
-      ChatCommand(
-        name: '清除對話',
-        description: '開始一個新的對話並清除當前畫面',
-        icon: Icons.delete_sweep_outlined,
-        execute: (context, chat, conv) async {
-          conv.startNewConversation();
-        },
-      ),
-      ChatCommand(
-        name: '總結對話',
-        description: '讓 AI 總結目前的對話內容',
-        icon: Icons.summarize_outlined,
-        execute: (context, chat, conv) async {
-          await chat.sendMessage('請幫我總結目前的對話內容。');
-        },
-      ),
-      ChatCommand(
-        name: '獲取幫助',
-        description: '顯示如何使用 Learnio 的說明',
-        icon: Icons.help_outline,
-        execute: (context, chat, conv) async {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('正在開啟幫助文件...')),
+    return _remoteCommands;
+  }
+
+  static Future<List<ChatCommand>> fetchRemoteCommands() async {
+    try {
+      final response = await http.get(Uri.parse(_commandsUrl));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+        _remoteCommands = data.where((item) => item['enable'] == true).map((item) {
+          return ChatCommand(
+            name: item['name'] ?? '',
+            description: item['desc'] ?? '',
+            icon: AppIcons.getIcon(item['icon'] ?? 'help_outline'),
+            execute: (context, chat, conv) async {
+              if (item['output'] != null) {
+                await chat.sendMessage(item['output']);
+              }
+            },
           );
-        },
-      ),
-    ];
+        }).toList();
+        _hasFetched = true;
+        return _remoteCommands;
+      }
+    } catch (e) {
+      logE('Error fetching remote commands: $e');
+    }
+    return [];
   }
 }

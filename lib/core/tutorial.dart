@@ -1,5 +1,4 @@
 import 'package:learnio/base.dart';
-import 'package:learnio/core/install.dart';
 
 mixin TutorialPageIntroductionCtrler {
   final PageController pageCtrler = PageController();

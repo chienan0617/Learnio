@@ -46,16 +46,30 @@ class _ChatInputBarState extends State<ChatInputBar> {
   List<String> _selectedLinks = [];
   final ImagePicker _picker = ImagePicker();
   final List<ChatCommand> _commands = CommandController.getCommands();
+  bool _isLoadingCommands = true;
 
   @override
   void initState() {
     super.initState();
+    _loadRemoteCommands();
     _textController.addListener(() {
       final hasText = _textController.text.trim().isNotEmpty;
       if (hasText != _hasText) {
         setState(() => _hasText = hasText);
       }
     });
+  }
+
+  Future<void> _loadRemoteCommands() async {
+    setState(() => _isLoadingCommands = true);
+    await CommandController.fetchRemoteCommands();
+    if (mounted) {
+      setState(() {
+        _commands.clear();
+        _commands.addAll(CommandController.getCommands());
+        _isLoadingCommands = false;
+      });
+    }
   }
 
   @override
@@ -233,7 +247,12 @@ class _ChatInputBarState extends State<ChatInputBar> {
               column([
                 if (_selectedFiles.isNotEmpty || _selectedLinks.isNotEmpty) ...[
                   padding(
-                    symmetricH(DesignSystem.space12),
+                    const EdgeInsets.only(
+                      left: DesignSystem.space12,
+                      right: DesignSystem.space12,
+                      top: DesignSystem.space12,
+                      bottom: DesignSystem.space8,
+                    ),
                     column([
                       if (_selectedFiles.isNotEmpty)
                         scroll(
@@ -389,18 +408,35 @@ class _ChatInputBarState extends State<ChatInputBar> {
             ),
           ),
         ),
+
+        // AI 免責聲明
+        padding(
+          const EdgeInsets.only(top: DesignSystem.space8),
+          center(text(
+            'Learnio 可能會出錯。請核實重要資訊。',
+            11,
+            fw4,
+            tx6.withOpacity(0.7),
+          )),
+        ),
       ]),
       padding: EdgeInsets.only(
         left: DesignSystem.space16,
         right: DesignSystem.space16,
         top: DesignSystem.space12,
-        bottom: MediaQuery.of(context).padding.bottom + DesignSystem.space16,
+        bottom: MediaQuery.of(context).padding.bottom + DesignSystem.space8,
       ),
       color: Colors.transparent, // 移除原本的滿版背景
     );
   }
 
   Widget _buildModelMenu() {
+    if (widget.chatController.isLoadingModels) {
+      return _buildFloatingMenu(
+        List.generate(3, (index) => _buildMenuItemSkeleton()),
+      );
+    }
+
     return _buildFloatingMenu(
       widget.chatController.availableModels.map((model) {
         final isSelected = model.name == widget.chatController.selectedModel;
@@ -534,6 +570,12 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   Widget _buildCommandMenu() {
+    if (_isLoadingCommands) {
+      return _buildFloatingMenu(
+        List.generate(3, (index) => _buildMenuItemSkeleton()),
+      );
+    }
+
     return _buildFloatingMenu(
       _commands
           .map(
@@ -552,6 +594,23 @@ class _ChatInputBarState extends State<ChatInputBar> {
             ),
           )
           .toList(),
+    );
+  }
+
+  Widget _buildMenuItemSkeleton() {
+    return padding(
+      symmetric(DesignSystem.space10, DesignSystem.space8),
+      row([
+        skeleton(width: 36, height: 36, radius: DesignSystem.borderM),
+        width(DesignSystem.space12),
+        expand(
+          column([
+            skeleton(width: 100, height: 14, radius: DesignSystem.borderS),
+            height(DesignSystem.space8),
+            skeleton(width: 150, height: 10, radius: DesignSystem.borderS),
+          ], ca: CrossAxisAlignment.start),
+        ),
+      ]),
     );
   }
 

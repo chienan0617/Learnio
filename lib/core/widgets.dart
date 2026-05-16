@@ -327,7 +327,7 @@ Widget flexible(
 class AnimatedListItem extends StatelessWidget {
   final int index;
   final Widget child;
-  const AnimatedListItem({Key? key, required this.index, required this.child}) : super(key: key);
+  const AnimatedListItem({super.key, required this.index, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -346,6 +346,60 @@ class AnimatedListItem extends StatelessWidget {
         );
       },
       child: child,
+    );
+  }
+}
+Widget skeleton({
+  double? width,
+  double? height,
+  BorderRadius? radius,
+  EdgeInsets? margin,
+  EdgeInsets? padding,
+  Color? baseColor,
+  Color? highlightColor,
+  BoxShape shape = BoxShape.rectangle,
+}) => Shimmer.fromColors(
+  baseColor: baseColor ?? bg3.withValues(alpha: 0.3),
+  highlightColor: highlightColor ?? bg3.withValues(alpha: 0.1),
+  child: container(
+    box(),
+    width: width,
+    height: height,
+    radius: radius ?? DesignSystem.borderM,
+    margin: margin,
+    padding: padding,
+    color: bg3,
+    shape: shape,
+  ),
+);
+
+class Skeleton extends StatelessWidget {
+  final double? width;
+  final double? height;
+  final BorderRadius? radius;
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
+  final BoxShape shape;
+
+  const Skeleton({
+    super.key,
+    this.width,
+    this.height,
+    this.radius,
+    this.margin,
+    this.padding,
+    this.shape = BoxShape.rectangle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return skeleton(
+      width: width,
+      height: height,
+      radius: radius,
+      margin: margin,
+      padding: padding,
+      shape: shape,
     );
   }
 }
