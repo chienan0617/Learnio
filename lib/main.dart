@@ -17,7 +17,7 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   @override
-  Widget build(BuildContext context) => kDebugMode
+  Widget build(BuildContext context) => false
       ? DevicePreview(builder: (_) => const MainPage())
       : const MainPage();
 }

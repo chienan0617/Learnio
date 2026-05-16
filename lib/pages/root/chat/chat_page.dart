@@ -5,6 +5,7 @@ import 'package:learnio/script/controller/chat/learning_controller.dart';
 import 'package:learnio/pages/root/chat/widgets/message_bubble.dart';
 import 'package:learnio/pages/root/chat/widgets/chat_input_bar.dart';
 import 'package:learnio/pages/root/chat/widgets/typing_indicator.dart';
+import 'package:learnio/script/types/chat_message.dart';
 
 class ChatPage extends StatefulWidget {
   final ChatController chatController;
@@ -60,113 +61,134 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     final isIncognito = _chat.isIncognito;
-    
+
     return Scaffold(
-      backgroundColor: isIncognito ? hexColor('#12171b') : bg1,
+      backgroundColor: Colors.transparent,
       body: column([
         // 頂部欄
         _buildTopBar(context),
 
-      // 無痕模式橫幅
-      if (isIncognito)
-        container(
-          row([
-            icon(Icons.privacy_tip_outlined, 14, Colors.white),
-            width(8),
-            text('已啟動無痕模式 - 訊息不會被儲存', 12, fw5, Colors.white),
-          ], ma: MainAxisAlignment.center),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          color: hexColor('#2d3436'),
+        // 無痕模式橫幅
+        if (isIncognito)
+          container(
+            row([
+              icon(Icons.privacy_tip_outlined, 14, Colors.white),
+              width(8),
+              text('已啟動無痕模式 - 訊息不會被儲存', 12, fw5, Colors.white),
+            ], ma: MainAxisAlignment.center),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            color: hexColor('#2d3436'),
+          ),
+
+        // 內容區
+        expand(
+          stack([
+            // 訊息列表
+            Positioned.fill(
+              child: _chat.messages.isEmpty
+                  ? _buildEmptyState()
+                  : _buildMessageList(),
+            ),
+
+            // 懸浮輸入區
+            positioned(
+              ChatInputBar(
+                chatController: _chat,
+                conversationController: _conv,
+                onSend: (content, images, files, links) => _chat.sendMessage(
+                  content,
+                  images: images,
+                  files: files,
+                  links: links,
+                ),
+                onVoicePressed: () {
+                  // TODO: 語音輸入
+                },
+                onFilesSelected: (files) {
+                  // TODO: 處理選擇的文件
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: text('已選擇 ${files.length} 個檔案')),
+                  );
+                },
+              ),
+              b: 0,
+              l: 0,
+              r: 0,
+            ),
+          ]),
         ),
-
-      // 訊息列表
-      expand(
-        _chat.messages.isEmpty ? _buildEmptyState() : _buildMessageList(),
-      ),
-
-      // 輸入區
-      ChatInputBar(
-        chatController: _chat,
-        conversationController: _conv,
-        onSend: (content, images, files, links) => _chat.sendMessage(content, images: images, files: files, links: links),
-        onVoicePressed: () {
-          // TODO: 語音輸入
-        },
-        onFilesSelected: (files) {
-          // TODO: 處理選擇的文件
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: text('已選擇 ${files.length} 個檔案')));
-        },
-      ),
-    ], ms: MainAxisSize.max),
+      ], ms: MainAxisSize.max),
     );
   }
 
   Widget _buildTopBar(BuildContext context) {
     final isIncognito = _chat.isIncognito;
-    
+
     return container(
-      row([
-        // 漢堡選單
-        iconButton(
-          icon(Icons.menu_outlined, 26, isIncognito ? tx1 : null),
-          () {
-            HapticFeedback.lightImpact();
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-
-        expand(
-          text(
-            isIncognito ? '無痕對話' : (_chat.current?.title ?? 'Learnio'),
-            18,
-            fw6,
-            isIncognito ? tx1 : tx1,
-            false,
-            null,
-            fsN,
-            TextAlign.center,
-            1,
-            TextOverflow.ellipsis,
+      row(
+        [
+          // 漢堡選單
+          iconButton(
+            icon(Icons.menu_outlined, 26, isIncognito ? tx1 : null),
+            () {
+              HapticFeedback.lightImpact();
+              Scaffold.of(context).openDrawer();
+            },
           ),
-        ),
 
-        // 無痕模式切換
-        iconButton(
-          icon(
-            isIncognito ? Icons.privacy_tip : Icons.privacy_tip_outlined,
-            24,
-            isIncognito ? primary : tx6,
+          expand(
+            text(
+              isIncognito ? '無痕對話' : (_chat.current?.title ?? 'Learnio'),
+              18,
+              fw6,
+              isIncognito ? tx1 : tx1,
+              false,
+              null,
+              fsN,
+              TextAlign.center,
+              1,
+              TextOverflow.ellipsis,
+            ),
           ),
-          () {
-            HapticFeedback.mediumImpact();
-            _conv.setIncognito(!isIncognito);
-            setState(() {});
-          },
-        ),
 
-        // 新對話 (非無痕模式才顯示，或在無痕模式下作為重置)
-        iconButton(
-          icon(Icons.add_comment_outlined, 24, isIncognito ? tx1 : null),
-          () {
-            HapticFeedback.lightImpact();
-            _conv.startNewConversation();
-            setState(() {});
-          },
-        ),
-      ]),
+          // 無痕模式切換
+          iconButton(
+            icon(
+              isIncognito ? Icons.privacy_tip : Icons.privacy_tip_outlined,
+              24,
+              isIncognito ? primary : tx6,
+            ),
+            () {
+              HapticFeedback.mediumImpact();
+              _conv.setIncognito(!isIncognito);
+              setState(() {});
+            },
+          ),
+
+          // 新對話 (非無痕模式才顯示，或在無痕模式下作為重置)
+          iconButton(
+            icon(Icons.add_comment_outlined, 24, isIncognito ? tx1 : null),
+            () {
+              HapticFeedback.lightImpact();
+              _conv.startNewConversation();
+              setState(() {});
+            },
+          ),
+        ],
+        ma: maC,
+        ca: caC,
+      ),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + DesignSystem.space8,
         left: DesignSystem.space12,
         right: DesignSystem.space12,
         bottom: DesignSystem.space8,
       ),
-      color: isIncognito ? bg2 : bg1,
+      color: isIncognito ? bg2 : Colors.transparent,
       border: Border(
         bottom: BorderSide(
-          color: isIncognito ? bg3 : bg3.withOpacity(0.2), 
+          color: isIncognito ? bg3 : bg3.withOpacity(0.2),
           width: 0.5,
         ),
       ),
@@ -176,57 +198,46 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildEmptyState() {
     return scroll(
       padding(
-        symmetric(DesignSystem.space32, 64),
-        column(
-          [
-            // AI Logo
-            container(
-              logo(40, Colors.white),
-              width: 80,
-              height: 80,
-              gradient: LinearGradient(
-                colors: [primary, secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        symmetric(DesignSystem.space32, 32),
+        column([
+          height(MediaQuery.of(context).size.height * 0.1),
+          // AI Logo
+          container(
+            logo(64),
+            width: 80,
+            height: 80,
+            radius: DesignSystem.borderXL,
+            shadow: [
+              BoxShadow(
+                color: primary.withOpacity(0.15),
+                blurRadius: 40,
+                offset: const Offset(0, 10),
               ),
-              radius: DesignSystem.borderXL,
-              shadow: [
-                BoxShadow(
-                  color: primary.withOpacity(0.25),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            height(DesignSystem.space32),
-            text(
-              '有什麼想學的嗎？',
-              24,
-              fw8,
-              tx1,
-              false,
-              null,
-              fsN,
-              TextAlign.center,
-            ),
-            height(DesignSystem.space12),
-            text(
-              '我是 Learnio，你的 AI 學習助手\n我可以幫你整理知識、回答問題或制定學習計劃',
-              14,
-              fw4,
-              tx6,
-              false,
-              null,
-              fsN,
-              TextAlign.center,
-            ),
-            height(DesignSystem.space32),
+            ],
+          ),
+          height(DesignSystem.space32),
+          text('今天想學點什麼？', 28, fw8, tx1, false, null, fsN, TextAlign.center),
+          height(DesignSystem.space12),
+          text(
+            '我是 Learnio，你的專屬 AI 學習助手。',
+            15,
+            fw5,
+            tx6,
+            false,
+            null,
+            fsN,
+            TextAlign.center,
+          ),
+          height(48),
 
-            // 建議問題
-            ..._buildSuggestions(),
-          ],
-          ca: CrossAxisAlignment.center,
-        ),
+          // 建議問題區塊
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: _buildSuggestions(),
+          ),
+        ], ca: CrossAxisAlignment.center),
       ),
     );
   }
@@ -240,38 +251,23 @@ class _ChatPageState extends State<ChatPage> {
     ];
 
     return suggestions.map((s) {
-      return padding(
-        const EdgeInsets.only(bottom: DesignSystem.space12),
-        inkWell(
-          container(
-            row([
-              text(s.$1, 20),
-              width(DesignSystem.space16),
-              expand(
-                text(
-                  s.$2,
-                  14,
-                  fw5,
-                  tx1,
-                ),
-              ),
-              icon(
-                Icons.arrow_forward_ios_rounded,
-                14,
-                tx6.withOpacity(0.4),
-              ),
-            ]),
-            width: double.infinity,
-            padding: symmetric(DesignSystem.space20, DesignSystem.space16),
-            color: bg2,
-            radius: DesignSystem.borderM,
-            border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
-          ),
-          () {
-            HapticFeedback.lightImpact();
-            _chat.sendMessage(s.$2);
-          },
+      return inkWell(
+        container(
+          row([
+            text(s.$1, 20),
+            width(DesignSystem.space12),
+            expand(text(s.$2, 14, fw5, tx1)),
+          ]),
+          width: MediaQuery.of(context).size.width * 0.4,
+          padding: symmetric(DesignSystem.space16, DesignSystem.space16),
+          color: bg2.withOpacity(0.6),
+          radius: DesignSystem.borderL,
+          border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
         ),
+        () {
+          HapticFeedback.lightImpact();
+          _chat.sendMessage(s.$2);
+        },
       );
     }).toList();
   }
@@ -279,18 +275,36 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(vertical: DesignSystem.space8),
-      itemCount: _chat.messages.length + (_chat.isThinking ? 1 : 0),
+      padding: const EdgeInsets.only(
+        top: DesignSystem.space8,
+        bottom: DesignSystem.space16,
+      ),
+      itemCount: _chat.messages.length + (_chat.isThinking ? 1 : 0) + 1,
       itemBuilder: (context, index) {
+        // 最後一個是空間補足，確保最後一條訊息不被輸入框遮擋
+        if (index == _chat.messages.length + (_chat.isThinking ? 1 : 0)) {
+          return const SizedBox(height: 160);
+        }
+
         // 最後一個是打字指示器 (僅在思考中顯示)
         if (index == _chat.messages.length && _chat.isThinking) {
           return const TypingIndicator();
         }
 
         final msg = _chat.messages[index];
+        if (msg.role == MessageRole.assistant &&
+            msg.content.isEmpty &&
+            _chat.isThinking) {
+          return const SizedBox.shrink();
+        }
+
         return MessageBubble(
           key: ValueKey(msg.id),
           message: msg,
+          isGenerating:
+              index == _chat.messages.length - 1 &&
+              _chat.isGenerating &&
+              msg.role == MessageRole.assistant,
           onFavoriteToggle: () {
             _chat.toggleFavorite(msg.id);
           },
@@ -307,12 +321,7 @@ class _ChatPageState extends State<ChatPage> {
             );
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: text(
-                  '已儲存到學習庫',
-                  14,
-                  fw4,
-                  Colors.white,
-                ),
+                content: text('已儲存到學習庫', 14, fw4, Colors.white),
                 backgroundColor: bg4,
                 behavior: SnackBarBehavior.floating,
                 duration: const Duration(seconds: 2),

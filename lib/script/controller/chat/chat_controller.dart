@@ -139,6 +139,8 @@ class ChatController {
           : content;
     }
 
+    _conversationController.updateConversation(current!);
+
     _isGenerating = true;
     _isStopping = false;
     onStateChanged?.call();
@@ -227,6 +229,7 @@ class ChatController {
       }
     } finally {
       current!.updatedAt = DateTime.now();
+      _conversationController.updateConversation(current!);
       _isGenerating = false;
       _isStopping = false;
       onStateChanged?.call();
@@ -239,6 +242,7 @@ class ChatController {
     final idx = current!.messages.indexWhere((m) => m.id == messageId);
     if (idx != -1) {
       current!.messages[idx].isFavorite = !current!.messages[idx].isFavorite;
+      _conversationController.updateConversation(current!);
       onStateChanged?.call();
     }
   }

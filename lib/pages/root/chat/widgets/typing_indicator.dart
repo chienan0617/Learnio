@@ -1,4 +1,5 @@
 import 'package:learnio/base.dart';
+import 'dart:ui' as ui;
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
@@ -24,8 +25,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
     _animations = _controllers.map((c) {
       return Tween<double>(
-        begin: 0,
-        end: -6,
+        begin: 0.2,
+        end: 1.0,
       ).animate(CurvedAnimation(parent: c, curve: Curves.easeInOut));
     }).toList();
 
@@ -47,59 +48,85 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
-    return padding(
-      const EdgeInsets.only(
-        left: DesignSystem.space12,
-        right: DesignSystem.space32,
-        top: DesignSystem.space8,
-        bottom: DesignSystem.space8,
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: AnimationController(
+          duration: const Duration(milliseconds: 500),
+          vsync: this,
+        )..forward(),
+        curve: Curves.easeIn,
       ),
-      column([
-        // AI 標籤
-        padding(
-          const EdgeInsets.only(
-              bottom: DesignSystem.space8, left: DesignSystem.space4),
-          row([
-            _buildAvatar(),
-            width(DesignSystem.space8),
-            text(
-              'Learnio',
-              12,
-              fw7,
+      child: padding(
+        const EdgeInsets.only(
+          left: DesignSystem.space12,
+          right: DesignSystem.space32,
+          top: DesignSystem.space8,
+          bottom: DesignSystem.space8,
+        ),
+        column([
+          // AI 標籤
+          padding(
+            const EdgeInsets.only(
+              bottom: DesignSystem.space8,
+              left: DesignSystem.space4,
             ),
-          ]),
-        ),
-
-        // 打字指示器氣泡
-        container(
-          row(List.generate(3, (i) {
-            return AnimatedBuilder(
-              animation: _animations[i],
-              builder: (_, __) => Transform.translate(
-                offset: Offset(0, _animations[i].value),
-                child: container(
-                  const SizedBox.shrink(),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: 6,
-                  height: 6,
-                  color: primary.withOpacity(0.4 + i * 0.2),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            );
-          })),
-          padding: const EdgeInsets.symmetric(
-              horizontal: DesignSystem.space20, vertical: DesignSystem.space16),
-          color: bg2,
-          radius: BorderRadius.only(
-            topLeft: Radius.zero,
-            topRight: DesignSystem.borderL.topRight,
-            bottomLeft: DesignSystem.borderL.bottomLeft,
-            bottomRight: DesignSystem.borderL.bottomRight,
+            row([
+              _buildAvatar(),
+              width(DesignSystem.space8),
+              text('Learnio', 12, fw7, tx6),
+            ]),
           ),
-          border: Border.all(color: bg3.withOpacity(0.4), width: 0.5),
-        ),
-      ]),
+
+          // 打字指示器氣泡 (Glassmorphism)
+          ClipRRect(
+            borderRadius: DesignSystem.borderXL,
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: container(
+                row(
+                  List.generate(3, (i) {
+                    return AnimatedBuilder(
+                      animation: _animations[i],
+                      builder: (_, __) {
+                        final val = _animations[i].value;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 7,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                primary.withOpacity(0.4 + val * 0.6),
+                                primary.withOpacity(0),
+                              ],
+                              stops: const [0.6, 1.0],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: primary.withOpacity(0.3 * val),
+                                blurRadius: 4 * val,
+                                spreadRadius: 1 * val,
+                              ),
+                            ],
+                          ),
+                          child: const SizedBox.shrink(),
+                        );
+                      },
+                    );
+                  }),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DesignSystem.space20,
+                  vertical: DesignSystem.space16,
+                ),
+                color: bg2.withOpacity(0.7),
+                border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
+              ),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 

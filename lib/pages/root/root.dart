@@ -11,6 +11,8 @@ import 'package:learnio/pages/root/project/project_page.dart';
 import 'package:learnio/pages/root/favorite/favorite_page.dart';
 import 'package:learnio/pages/root/learning/learning_page.dart';
 import 'package:learnio/pages/root/settings/settings_page.dart';
+import 'package:learnio/pages/root/user/user_info_page.dart';
+import 'dart:ui' as ui;
 
 class RootPage extends StatefulWidget {
   const RootPage({super.key});
@@ -68,7 +70,7 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bg1,
-      drawerScrimColor: Colors.black54,
+      drawerScrimColor: Colors.black45,
       drawer: SideBar(
         conversationController: _convController,
         searchController: _searchController,
@@ -77,14 +79,25 @@ class _RootPageState extends State<RootPage> {
         onSelectConversation: _selectConversation,
         onNewConversation: _startNewConversation,
       ),
-      body: AnimatedSwitcher(
-        duration: DesignSystem.animNormal,
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        child: container(
-          _buildCurrentPage(),
-          key: ValueKey(_currentPage),
-        ),
+      body: Stack(
+        children: [
+          // Clean dark background
+          Positioned.fill(
+            child: Container(
+              color: bg1, // Deep dark color
+            ),
+          ),
+          // Main Content
+          AnimatedSwitcher(
+            duration: DesignSystem.animNormal,
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: container(
+              _buildCurrentPage(),
+              key: ValueKey(_currentPage),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -114,6 +127,8 @@ class _RootPageState extends State<RootPage> {
         );
       case 'settings':
         return const SettingsPage();
+      case 'user':
+        return const UserInfoPage();
       default:
         return ChatPage(
           chatController: _chatController,

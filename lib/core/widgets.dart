@@ -78,14 +78,17 @@ SingleChildScrollView scroll(Widget v, [ScrollPhysics? p]) =>
 Icon icon(IconData icon, [double size = 20, Color? color, FontWeight? fw]) =>
     Icon(icon, size: size, color: color ?? tx1, fontWeight: fw);
 
-Widget logo([double size = 20, Color? color]) => true
-    ? Icon(Icons.auto_awesome, size: size, color: color)
-    : Image.asset(
-        'assets/icon/icon.webp',
-        width: size,
-        height: size,
-        color: color,
-      );
+Widget logo([double size = 20, Color? color]) => container(
+      center(Icon(
+        Icons.auto_stories_rounded,
+        size: size * 0.6,
+        color: color ?? Colors.white,
+      )),
+      width: size,
+      height: size,
+      radius: BorderRadius.circular(size * 0.25),
+      color: color == null ? primary : color.withOpacity(0.2),
+    );
 
 IconButton iconButton(
   Widget icon,
@@ -319,4 +322,30 @@ Widget flexible(
   chosen ??= const SizedBox.shrink();
 
   return chosen;
+}
+
+class AnimatedListItem extends StatelessWidget {
+  final int index;
+  final Widget child;
+  const AnimatedListItem({Key? key, required this.index, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      key: ValueKey('anim_$index'),
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 300 + (index * 50).clamp(0, 500)),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
 }

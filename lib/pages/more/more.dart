@@ -60,7 +60,7 @@ class _MorePageState extends State<MorePage> {
     return center(
       column([
         container(
-          Image.asset("assets/image/logo/logo.png", height: 70),
+          logo(70),
           padding: const EdgeInsets.all(16),
           color: bg2,
           radius: BorderRadius.circular(24),
@@ -132,15 +132,7 @@ class _MorePageState extends State<MorePage> {
       container(
         row([
           container(
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                product['logo']!,
-                width: 52,
-                height: 52,
-                fit: BoxFit.cover,
-              ),
-            ),
+            logo(52),
             radius: BorderRadius.circular(12),
             shadow: [
               BoxShadow(

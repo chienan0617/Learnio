@@ -3,6 +3,7 @@ import 'package:learnio/base.dart';
 class System implements Initialable {
   // static final String version = 'Alpha 0.0.10';
   static final bool debugMode = true;
+  static const bool showLearningLibrary = true;
 
   static late final bool resetDatabase;
   static late final String version;

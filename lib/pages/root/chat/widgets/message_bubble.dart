@@ -2,9 +2,14 @@ import 'package:learnio/base.dart';
 import 'package:learnio/script/types/chat_message.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:learnio/pages/root/chat/widgets/markdown_builders.dart';
+import 'package:markdown/markdown.dart' as md;
+import 'dart:ui' as ui;
+
 
 class MessageBubble extends StatefulWidget {
   final ChatMessage message;
+  final bool isGenerating;
   final VoidCallback? onFavoriteToggle;
   final VoidCallback? onSaveToLibrary;
   final VoidCallback? onRetry;
@@ -12,6 +17,7 @@ class MessageBubble extends StatefulWidget {
   const MessageBubble({
     super.key,
     required this.message,
+    this.isGenerating = false,
     this.onFavoriteToggle,
     this.onSaveToLibrary,
     this.onRetry,
@@ -22,10 +28,13 @@ class MessageBubble extends StatefulWidget {
 }
 
 class _MessageBubbleState extends State<MessageBubble>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+
+  late AnimationController _breatheController;
+  late Animation<double> _breatheAnimation;
 
   @override
   void initState() {
@@ -46,11 +55,37 @@ class _MessageBubbleState extends State<MessageBubble>
       curve: Curves.easeOutCubic,
     ));
     _animController.forward();
+
+    _breatheController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _breatheAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _breatheController, curve: Curves.easeInOut),
+    );
+
+    if (widget.isGenerating) {
+      _breatheController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(MessageBubble oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isGenerating != oldWidget.isGenerating) {
+      if (widget.isGenerating) {
+        _breatheController.repeat(reverse: true);
+      } else {
+        _breatheController.stop();
+        _breatheController.animateTo(0, duration: const Duration(milliseconds: 300));
+      }
+    }
   }
 
   @override
   void dispose() {
     _animController.dispose();
+    _breatheController.dispose();
     super.dispose();
   }
 
@@ -95,64 +130,92 @@ class _MessageBubbleState extends State<MessageBubble>
               ),
 
               // 訊息氣泡
-              container(
-                column([
-                  if (msg.images != null && msg.images!.isNotEmpty) ...[
-                    _buildImageGrid(msg.images!),
-                    height(DesignSystem.space8),
-                  ],
-                  if (msg.files != null && msg.files!.isNotEmpty) ...[
-                    _buildFileList(msg.files!),
-                    height(DesignSystem.space8),
-                  ],
-                  if (msg.links != null && msg.links!.isNotEmpty) ...[
-                    _buildLinkList(msg.links!),
-                    height(DesignSystem.space8),
-                  ],
-                  if (msg.isError)
-                    _buildErrorContent()
-                  else
-                    MarkdownBody(
-                      data: msg.content,
-                      selectable: true,
-                      styleSheet: MarkdownStyleSheet(
-                        p: tsBodyLarge.copyWith(
-                          fontSize: 17,
-                          color: isUser ? tx1 : tx1.withOpacity(0.95),
+              ClipRRect(
+                borderRadius: DesignSystem.borderXL,
+                child: BackdropFilter(
+                  filter: !msg.isError
+                      ? ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15)
+                      : ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0),
+                  child: container(
+                    column([
+                      if (msg.images != null && msg.images!.isNotEmpty) ...[
+                        _buildImageGrid(msg.images!),
+                        height(DesignSystem.space8),
+                      ],
+                      if (msg.files != null && msg.files!.isNotEmpty) ...[
+                        _buildFileList(msg.files!),
+                        height(DesignSystem.space8),
+                      ],
+                      if (msg.links != null && msg.links!.isNotEmpty) ...[
+                        _buildLinkList(msg.links!),
+                        height(DesignSystem.space8),
+                      ],
+                      if (msg.isError)
+                        _buildErrorContent()
+                      else
+                        MarkdownBody(
+                          data: msg.content,
+                          selectable: true,
+                          extensionSet: md.ExtensionSet(
+                            md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+                            [
+                              ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes,
+                              MarkdownLatexSyntax(),
+                            ],
+                          ),
+                          builders: {
+                            'code': CodeElementBuilder(),
+                            'latex': LatexElementBuilder(),
+                          },
+                          styleSheet: MarkdownStyleSheet(
+                            p: tsBodyLarge.copyWith(
+                              fontSize: 15,
+                              color: tx1.withOpacity(0.95),
+                            ),
+                            h1: tsTitleLarge.copyWith(fontSize: 22),
+                            h2: tsTitleLarge.copyWith(fontSize: 20),
+                            h3: tsTitleLarge.copyWith(fontSize: 18),
+                            listBullet: tsBodyLarge.copyWith(fontSize: 15, color: CommonColors.warning),
+                            a: tsBodyLarge.copyWith(
+                              fontSize: 15,
+                              color: CommonColors.warning,
+                              decoration: TextDecoration.underline,
+                            ),
+                            blockquoteDecoration: BoxDecoration(
+                              border: Border(
+                                left: BorderSide(
+                                  color: CommonColors.warning.withOpacity(0.5),
+                                  width: 4,
+                                ),
+                              ),
+                            ),
+                            code: tsBodyMedium.copyWith(
+                              backgroundColor: bg3.withOpacity(0.3),
+                              fontFamily: 'monospace',
+                              fontSize: 13,
+                            ),
+                            codeblockDecoration: BoxDecoration(
+                              color: bg3.withOpacity(0.2),
+                              borderRadius: DesignSystem.borderS,
+                            ),
+                          ),
                         ),
-                        h1: tsTitleLarge.copyWith(fontSize: 24),
-                        h2: tsTitleLarge.copyWith(fontSize: 22),
-                        h3: tsTitleLarge.copyWith(fontSize: 20),
-                        listBullet: tsBodyLarge.copyWith(fontSize: 17, color: primary),
-                        code: tsBodyMedium.copyWith(
-                          backgroundColor: bg3.withOpacity(0.3),
-                          fontFamily: 'monospace',
-                        ),
-                        codeblockDecoration: BoxDecoration(
-                          color: bg3.withOpacity(0.2),
-                          borderRadius: DesignSystem.borderS,
-                        ),
-                      ),
+                    ]),
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    padding: symmetric(DesignSystem.space16, DesignSystem.space12),
+                    color: msg.isError
+                        ? Colors.red.withOpacity(0.05)
+                        : bg2.withOpacity(0.7),
+                    border: Border.all(
+                      color: msg.isError
+                          ? Colors.red.withOpacity(0.3)
+                          : bg3.withOpacity(0.3),
+                      width: 0.5,
                     ),
-                ]),
-                width: MediaQuery.of(context).size.width * 0.85,
-                padding: symmetric(DesignSystem.space16, DesignSystem.space12),
-                color: msg.isError 
-                    ? Colors.red.withOpacity(0.05) 
-                    : (isUser ? primary.withOpacity(0.08) : bg2),
-                radius: BorderRadius.only(
-                  topLeft: isUser ? DesignSystem.borderL.topLeft : Radius.zero,
-                  topRight: isUser ? Radius.zero : DesignSystem.borderL.topRight,
-                  bottomLeft: DesignSystem.borderL.bottomLeft,
-                  bottomRight: DesignSystem.borderL.bottomRight,
-                ),
-                border: Border.all(
-                  color: msg.isError 
-                      ? Colors.red.withOpacity(0.3) 
-                      : (isUser ? primary.withOpacity(0.15) : bg3.withOpacity(0.4)),
-                  width: 0.5,
+                  ),
                 ),
               ),
+
 
               // 操作按鈕列 (僅 AI 訊息且非錯誤)
               if (!isUser && !msg.isError)
@@ -196,11 +259,13 @@ class _MessageBubbleState extends State<MessageBubble>
   }
 
   Widget _buildAvatar() {
-    return container(
-      widget.message.isError
-          ? icon(Icons.error_outline, 16, Colors.white)
-          : logo(16, Colors.white),
-      width: 32,
+    return ScaleTransition(
+      scale: _breatheAnimation,
+      child: container(
+        widget.message.isError
+            ? icon(Icons.error_outline, 16, Colors.white)
+            : logo(16, Colors.white),
+        width: 32,
 
       height: 28,
       gradient: LinearGradient(
@@ -211,7 +276,7 @@ class _MessageBubbleState extends State<MessageBubble>
         end: Alignment.bottomRight,
       ),
       radius: DesignSystem.borderS,
-    );
+    ));
   }
 
   Widget _buildErrorContent() {

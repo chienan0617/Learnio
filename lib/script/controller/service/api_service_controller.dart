@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 /// Controller to manage API calls between the server and client.
 class ApiServiceController {
-  static const String _baseUrl = 'http://127.0.0.1:8787/learnio/chat';
+  static const String _baseUrl = 'http://cas.cas617.workers.dev/learnio/chat';
 
   /// Sends chat context to the server and returns a stream of responses.
   ///
@@ -20,11 +20,15 @@ class ApiServiceController {
   }) async* {
     final filteredMessages = messages.where((msg) {
       final content = msg['content'];
-      final hasContent = content != null && content.toString().trim().isNotEmpty;
-      final hasImages = msg['images'] != null && (msg['images'] as List).isNotEmpty;
-      final hasFiles = msg['files'] != null && (msg['files'] as List).isNotEmpty;
-      final hasLinks = msg['links'] != null && (msg['links'] as List).isNotEmpty;
-      
+      final hasContent =
+          content != null && content.toString().trim().isNotEmpty;
+      final hasImages =
+          msg['images'] != null && (msg['images'] as List).isNotEmpty;
+      final hasFiles =
+          msg['files'] != null && (msg['files'] as List).isNotEmpty;
+      final hasLinks =
+          msg['links'] != null && (msg['links'] as List).isNotEmpty;
+
       return hasContent || hasImages || hasFiles || hasLinks;
     }).toList();
 

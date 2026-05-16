@@ -10,6 +10,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _hapticEnabled = true;
+  bool _showHistoryTime = Data.app.get<bool>('showHistoryTime', true) ?? true;
   final String _language = '繁體中文';
 
   @override
@@ -36,6 +37,15 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: '觸覺反饋',
                     value: _hapticEnabled,
                     onChanged: (v) => setState(() => _hapticEnabled = v),
+                  ),
+                  _toggleTile(
+                    iconData: Icons.access_time_rounded,
+                    title: '顯示歷史紀錄時間',
+                    value: _showHistoryTime,
+                    onChanged: (v) {
+                      setState(() => _showHistoryTime = v);
+                      Data.app.put('showHistoryTime', v);
+                    },
                   ),
                 ]),
 

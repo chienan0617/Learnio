@@ -2,6 +2,7 @@ import 'package:learnio/base.dart';
 import 'package:learnio/script/controller/chat/conversation_controller.dart';
 import 'package:learnio/script/controller/chat/search_controller.dart';
 import 'package:learnio/script/controller/chat/project_controller.dart';
+import 'dart:ui' as ui;
 
 class SideBar extends StatefulWidget {
   final ConversationController conversationController;
@@ -51,19 +52,26 @@ class _SideBarState extends State<SideBar> {
   Widget build(BuildContext context) {
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.85,
-      backgroundColor: bg1,
+      backgroundColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      child: SafeArea(
-        child: column([
-          _buildHeader(),
-          _buildSearchBar(),
-          expand(
-            _isSearching ? _buildSearchResults() : _buildMainMenu(),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            color: bg1.withOpacity(0.8),
+            child: SafeArea(
+              child: column([
+                _buildHeader(),
+                _buildSearchBar(),
+                expand(_isSearching ? _buildSearchResults() : _buildMainMenu()),
+                const Divider(height: 1, thickness: 0.5, color: Colors.white10),
+                _buildFooter(),
+              ], ms: MainAxisSize.max),
+            ),
           ),
-          const Divider(height: 1, thickness: 0.5, color: Colors.white10),
-          _buildFooter(),
-        ], ms: MainAxisSize.max),
+        ),
       ),
     );
   }
@@ -104,9 +112,9 @@ class _SideBarState extends State<SideBar> {
           container(
             icon(Icons.add_rounded, 20, tx1),
             padding: symmetricAll(DesignSystem.space8),
-            color: bg2,
+            color: bg2.withOpacity(0.6),
             radius: DesignSystem.borderM,
-            border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
+            border: Border.all(color: bg3.withOpacity(0.3), width: 0.5),
           ),
           () {
             HapticFeedback.lightImpact();
@@ -135,13 +143,10 @@ class _SideBarState extends State<SideBar> {
             hintStyle: tsBodyMedium.copyWith(color: tx6.withOpacity(0.5)),
             prefixIcon: icon(Icons.search_outlined, 20, tx6),
             suffixIcon: _isSearching
-                ? iconButton(
-                    icon(Icons.close_outlined, 18, tx6),
-                    () {
-                      _searchCtrl.clear();
-                      _onSearch('');
-                    },
-                  )
+                ? iconButton(icon(Icons.close_outlined, 18, tx6), () {
+                    _searchCtrl.clear();
+                    _onSearch('');
+                  })
                 : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -165,116 +170,113 @@ class _SideBarState extends State<SideBar> {
       ),
       children: [
         // 功能選單
-        _menuItem(Icons.chat_outlined, '聊天', 'chat'),
-        _menuItem(Icons.folder_outlined, '專案', 'project'),
-        _menuItem(Icons.bookmark_outlined, '收藏', 'favorite'),
-        _menuItem(Icons.school_outlined, '學習庫', 'learning'),
-        _menuItem(Icons.settings_outlined, '設定', 'settings'),
+        AnimatedListItem(
+          index: 0,
+          child: _menuItem(Icons.folder_outlined, '專案', 'project'),
+        ),
+        AnimatedListItem(
+          index: 1,
+          child: _menuItem(Icons.bookmark_outlined, '收藏', 'favorite'),
+        ),
+        AnimatedListItem(
+          index: 2,
+          child: _menuItem(Icons.settings_outlined, '設定', 'settings'),
+        ),
 
         // 分隔線
-        padding(
-          const EdgeInsets.fromLTRB(
-            DesignSystem.space8,
-            DesignSystem.space20,
-            DesignSystem.space8,
-            DesignSystem.space8,
-          ),
-          row([
-            text('最近對話', 12, fw7, tx6),
-            spacer(),
-            text(
-              '${conversations.length}',
-              12,
-              fw5,
-              tx6.withOpacity(0.5),
+        AnimatedListItem(
+          index: 3,
+          child: padding(
+            const EdgeInsets.fromLTRB(
+              DesignSystem.space8,
+              DesignSystem.space20,
+              DesignSystem.space8,
+              DesignSystem.space8,
             ),
-          ]),
+            row([
+              text('最近對話', 12, fw7, tx6),
+              spacer(),
+              text('${conversations.length}', 12, fw5, tx6.withOpacity(0.5)),
+            ]),
+          ),
         ),
 
         // 歷史列表
-        ...conversations.map((conv) {
+        ...conversations.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final conv = entry.value;
           final isActive = conv.id == currentId;
-          return container(
-            ListTile(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                widget.onSelectConversation(conv.id);
-                Navigator.pop(context);
-              },
-              dense: true,
-              visualDensity: VisualDensity.compact,
-              leading: icon(
-                Icons.chat_bubble_outline_rounded,
-                16,
-                isActive ? primary : tx6,
-              ),
-              title: text(
-                conv.title,
-                14,
-                isActive ? fw6 : fw4,
-                isActive ? tx1 : tx2,
-                false,
-                null,
-                fsN,
-                TextAlign.start,
-                1,
-                TextOverflow.ellipsis,
-              ),
-              subtitle: text(
-                conv.timeLabel,
-                10,
-                fw4,
-                tx6.withOpacity(0.6),
-              ),
-              trailing: PopupMenuButton<String>(
-                padding: EdgeInsets.zero,
-                icon: icon(
-                  Icons.more_vert_rounded,
-                  16,
-                  tx6.withOpacity(0.5),
-                ),
-                onSelected: (value) {
-                  if (value == 'rename') {
-                    _showRenameConvDialog(conv.id, conv.title);
-                  } else if (value == 'delete') {
-                    _showDeleteConvDialog(conv.id, conv.title);
-                  }
+          bool showTime = Data.app.get<bool>('showTimeInHistory', true) ?? true;
+          return AnimatedListItem(
+            index: idx + 4,
+            child: container(
+              ListTile(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  widget.onSelectConversation(conv.id);
+                  Navigator.pop(context);
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'rename',
-                    height: 32,
-                    child: row([
-                      icon(Icons.edit_outlined, 14, tx2),
-                      width(8),
-                      text('重新命名', 12, fw4, tx6),
-                    ]),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    height: 32,
-                    child: row([
-                      icon(
-                        Icons.delete_outline_rounded,
-                        14,
-                        CommonColors.error,
-                      ),
-                      width(8),
-                      text(
-                        '刪除',
-                        12,
-                        fw4,
-                        CommonColors.error,
-                      ),
-                    ]),
-                  ),
-                ],
+                dense: true,
+                visualDensity: VisualDensity.compact,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                title: text(
+                  conv.title,
+                  14,
+                  isActive ? fw6 : fw4,
+                  isActive ? tx1 : tx2,
+                  false,
+                  null,
+                  fsN,
+                  TextAlign.start,
+                  1,
+                  TextOverflow.ellipsis,
+                ),
+                subtitle: showTime
+                    ? text(conv.timeLabel, 10, fw4, tx6.withOpacity(0.6))
+                    : null,
+                trailing: PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  icon: icon(Icons.more_vert_rounded, 16, tx6.withOpacity(0.5)),
+                  onSelected: (value) {
+                    if (value == 'rename') {
+                      _showRenameConvDialog(conv.id, conv.title);
+                    } else if (value == 'delete') {
+                      _showDeleteConvDialog(conv.id, conv.title);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'rename',
+                      height: 32,
+                      child: row([
+                        icon(Icons.edit_outlined, 14, tx2),
+                        width(8),
+                        text('重新命名', 12, fw4, tx6),
+                      ]),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      height: 32,
+                      child: row([
+                        icon(
+                          Icons.delete_outline_rounded,
+                          14,
+                          CommonColors.error,
+                        ),
+                        width(8),
+                        text('刪除', 12, fw4, CommonColors.error),
+                      ]),
+                    ),
+                  ],
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: DesignSystem.borderM,
+                ),
               ),
-              shape: RoundedRectangleBorder(borderRadius: DesignSystem.borderM),
+              margin: const EdgeInsets.only(bottom: 4),
+              color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
+              radius: DesignSystem.borderM,
             ),
-            margin: const EdgeInsets.only(bottom: 4),
-            color: isActive ? primary.withOpacity(0.1) : Colors.transparent,
-            radius: DesignSystem.borderM,
           );
         }),
       ],
@@ -372,9 +374,7 @@ class _SideBarState extends State<SideBar> {
 
   Widget _buildSearchResults() {
     if (_searchResults.isEmpty) {
-      return center(
-        text('找不到結果', 14, fw4, tx6),
-      );
+      return center(text('找不到結果', 14, fw4, tx6));
     }
 
     return ListView.builder(
@@ -453,22 +453,10 @@ class _SideBarState extends State<SideBar> {
             ),
             width(DesignSystem.space12),
             expand(
-              column(
-                [
-                  text(
-                    'Premium User',
-                    13,
-                    fw7,
-                  ),
-                  text(
-                    'Version ${System.version}',
-                    10,
-                    fw4,
-                    tx6,
-                  ),
-                ],
-                ca: CrossAxisAlignment.start,
-              ),
+              column([
+                text('Premium User', 13, fw7),
+                text('Version ${System.version}', 10, fw4, tx6),
+              ], ca: CrossAxisAlignment.start),
             ),
             width(DesignSystem.space8),
             buildAlphaTag(),
@@ -479,7 +467,9 @@ class _SideBarState extends State<SideBar> {
           border: Border.all(color: bg3.withOpacity(0.5), width: 0.5),
         ),
         () {
-          // TODO: 使用者資訊
+          HapticFeedback.lightImpact();
+          widget.onNavigate('user');
+          Navigator.pop(context);
         },
       ),
     );
@@ -488,18 +478,10 @@ class _SideBarState extends State<SideBar> {
 
 Widget buildAlphaTag() {
   return container(
-    text(
-      'ALPHA',
-      9,
-      fw7,
-      Colors.orangeAccent,
-    ),
+    text('ALPHA', 9, fw7, Colors.orangeAccent),
     padding: symmetric(6, 2),
     color: Colors.orangeAccent.withOpacity(0.1),
     radius: DesignSystem.borderS,
-    border: Border.all(
-      color: Colors.orangeAccent.withOpacity(0.3),
-      width: 0.5,
-    ),
+    border: Border.all(color: Colors.orangeAccent.withOpacity(0.3), width: 0.5),
   );
 }

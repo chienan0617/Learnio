@@ -28,6 +28,7 @@ export 'package:learnio/core/data.dart';
 export 'package:learnio/core/database.dart';
 export 'package:learnio/core/debug.dart';
 export 'package:learnio/core/file.dart';
+export 'package:learnio/core/icons.dart';
 export 'package:learnio/core/init.dart';
 export 'package:learnio/core/internet.dart';
 export 'package:learnio/core/language.dart';
@@ -52,6 +53,8 @@ export 'package:learnio/core/definition.dart' hide string;
 export 'package:learnio/core/widgets.dart';
 export 'package:learnio/core/design_system.dart';
 export 'package:learnio/core/exception.dart';
+export 'package:learnio/core/developer.dart';
+export 'package:learnio/core/install.dart';
 export 'package:learnio/script/controller/auth_controller.dart';
 
 
